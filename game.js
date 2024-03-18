@@ -1,8 +1,23 @@
 let objectSize =32;// 1マスの正方形の幅
 let blank =320;//マップの描画位置調整
-let scene=1 //画面遷移　タイトル0 ゲーム1
+let scene=0; //画面遷移　タイトル0 ゲーム1
 let enemyPositionX =blank +32*9;
 let enemyPositionY =320;
+
+//canvasの設定
+let canvas = document.getElementById( 'canvas' );
+canvas.width = 960;    //canvasの横幅
+canvas.height = 640;    //canvasの縦幅
+
+//コンテキストを取得
+let ctx = canvas.getContext( '2d' );
+let font = new FontFace('美咲ゴシック', 'url(fonts/misaki_gothic_2nd.ttf)');
+
+
+
+
+
+
 //マップのデータ生成
 let map = [
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -32,13 +47,7 @@ let map = [
 
 
 
-//canvasの設定
-let canvas = document.getElementById( 'canvas' );
-canvas.width = 1000;    //canvasの横幅
-canvas.height = 640;    //canvasの縦幅
 
-//コンテキストを取得
-let ctx = canvas.getContext( '2d' );
 
 //画像のオブジェクトを作る
 let moveCount =16;
@@ -50,9 +59,22 @@ mapchip.src = 'images/mapChip.png';
 
 let rabbit = new Object();//うさぎのオブジェクト生成
 rabbit.img = new Image();
-rabbit.img.src ='images/testrabbit3.png';
+
+
+rabbit.leftImg  ='images/leftRabbit1.png';
+rabbit.leftImg2 ='images/leftRabbit2.png';
+rabbit.rightImg ='images/rightRabbit1.png';
+rabbit.rightImg2='images/rightRabbit2.png';
+rabbit.upImg    ='images/upRabbit1.png';
+rabbit.upImg2   ='images/upRabbit2.png';
+rabbit.downImg  ='images/downRabbit1.png';
+rabbit.downImg2 ='images/downRabbit2.png';
+
+rabbit.img.src =rabbit.upImg;
+
 rabbit.x=blank +32*9;
 rabbit.y=blank +32*2;
+rabbit.moveDirection=2;//0左 1右 2上 3下
 rabbit.left  =false;
 rabbit.right =false;
 rabbit.up    =false;
@@ -61,12 +83,13 @@ rabbit.speed =2;
 
 
 class foxClass {
-    constructor(x,y,movePattern,imgsrc){
+    constructor(x,y,imgsrc){
         this.x=x;
         this.y=y;
-        this.movePattern =movePattern;
         this.img = new Image();
         this.img.src = imgsrc;
+        this.upImg;
+        this.downImg;
         this.speed =2;
         this.left=false;
         this.right=false;
@@ -80,9 +103,9 @@ class foxClass {
         
         if(this.moveCount==0){
             this.moveCount=objectSize/this.speed;
-            let moveDirection = Math.floor(Math.random()*4);//0左 1右 2上 3下
+            this.moveDirection = Math.floor(Math.random()*4);//0左 1右 2上 3下
            
-            if(moveDirection==0){//左
+            if(this.moveDirection==0){//左
                 if(fx>0) {
                     if(map[fy][fx-1] ===0){
                         this.moveReset();
@@ -92,7 +115,7 @@ class foxClass {
                         this.moveCount=0;
                     }
                 }
-            }else if(moveDirection ==1){//右
+            }else if(this.moveDirection ==1){//右
                 if(map[fy][fx+1] ===0){
                     this.moveReset();
                     this.right=true;
@@ -100,7 +123,7 @@ class foxClass {
                     this.moveReset();
                     this.moveCount=0;
                 }
-            }else if(moveDirection ==2){//上
+            }else if(this.moveDirection ==2){//上
                 if(fy>0){
                     if(map[fy-1][fx] ===0){
                         this.moveReset();
@@ -111,7 +134,7 @@ class foxClass {
                     }
                 }
                 
-            }else if(moveDirection ==3){//下
+            }else if(this.moveDirection ==3){//下
                  if(map[fy+1][fx] ===0){
                     this.moveReset();
                     this.down=true;
@@ -121,15 +144,40 @@ class foxClass {
                 }
             }
         }else{
-            this.moveCount--;
-            if(this.left==true) this.x-=2;
-            if(this.right==true) this.x+=2;
-            if(this.up==true) this.y-=2;
-            if(this.down==true) this.y+=2;
 
+            if(this.left==true) {
+                if(this.moveCount==16){
+                 
+                }
+                this.x-=2;
+            }
+            if(this.right==true) {
+                this.x+=2;
+            }
+            if(this.up==true) {
+                this.y-=2;
+            }
+            if(this.down==true) {
+                this.y+=2;
+            }
+            this.moveCount--;
         }
     }
     move2(){
+        let fx = (this.x/32)-(blank/32);
+        let fy = this.y/32;
+        
+        if(this.moveCount==0){
+          
+        }
+
+
+
+
+
+
+
+
         
     }
     moveReset(){
@@ -139,7 +187,7 @@ class foxClass {
         this.down=false;
     }
 }
-let yellowFox = new foxClass(enemyPositionX,enemyPositionY,1,'images/yellowFox.png');
+let yellowFox = new foxClass(enemyPositionX,enemyPositionY,'images/yellowFox.png');
 
 
 
@@ -153,7 +201,7 @@ key.left = false;
 
 let grass = new Object();//草のオブジェクト生成
 grass.img = new Image();
-grass.img.src ='images/grass.png';
+grass.img.src ='images/grass2.png';
 
 let mapObjects = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -192,27 +240,39 @@ let mapObjects = [
 
 
 function draw() {//常時繰り返し呼び出される関数
+    //キーボードが押された時、keydownfunc関数を呼び出す
+	addEventListener( "keydown", keydownfunc );
+    
     if(scene==0){
         drawTitle();
     }else if(scene==1){
         drawGame();
+        
     }
 
 
 
-
+    requestAnimationFrame( draw );
 }
 requestAnimationFrame( draw );
 
 function drawTitle(){
+    ctx.fillStyle = 'black';
+    ctx.fillRect(blank, 0, canvas.width, canvas.height);
+    // フォントのロードが完了したら描画を開始
+    font.load().then(function(loadedFont) {
+        document.fonts.add(loadedFont);
+        ctx.font = '36px 美咲ゴシック'; // 使用するフォントを指定
+        ctx.fillStyle = '#A7CC65';
+        ctx.fillText('PUSH SPACE KEY', 500, 320); // Canvas上にテキストを描画
+    });
+       
 
 }
 
 function drawGame(){
-    //キーボードが押された時、keydownfunc関数を呼び出す
-	addEventListener( "keydown", keydownfunc );
+    
     rabbitMove();//うさぎを移動する関数を呼び出す
-    //foxMove();//きつねを移動する関数を呼び出す
     yellowFox.move();
     drawMap();//マップを描画
    
@@ -226,7 +286,7 @@ function drawGame(){
 
 
    
-	requestAnimationFrame( draw ); //draw関数を呼び出しループさせる
+	
 }
 
 
@@ -268,14 +328,13 @@ function keydownfunc( event ) {
         key.right = false;
     } 
 
-    //--この中は完成時削除する
-    if( key_code === 32 ){//スペースキーで止まる
-        key.left  = false;
-        key.up    = false;
-        key.down  = false;
-        key.right = false;
+
+    if( scene==0 && key_code === 32 ){//スペースキーで止まる
+        
+        scene=1;
+    
     } 
-    //--この中は完成時削除する
+   
 }
 
 
@@ -285,7 +344,7 @@ function drawMap(){
             if ( map[y][x] === 0 ) {
                 ctx.drawImage( mapchip, 0, 0, 16, 16, 32 * x +blank, 32 * y , 32, 32 );
                 if(mapObjects[y][x]===1){
-                    ctx.drawImage( grass.img, 0, 0, 32, 32, 32 * x +blank, 32 * y , 32, 32 );
+                    ctx.drawImage( grass.img, 0, 0, 1280, 1280, 32 * x +blank, 32 * y , 32, 32 );
                 }
             }
             if ( map[y][x] === 1 ) {
@@ -299,6 +358,7 @@ function rabbitMove(){//うさぎを移動する関数
     let x = (rabbit.x/32)-(blank/32);
     let y = rabbit.y/32;
     if(moveCount==0){
+        alert(moveCount);
         moveCount=objectSize/rabbit.speed;
        
         if( key.left   === true ) {
@@ -306,14 +366,28 @@ function rabbitMove(){//うさぎを移動する関数
                 if(map[y][x-1] ===0){
                     rabbitMoveReset();
                     rabbit.left=true;
-                }else rabbitMoveReset();
+                }else {
+                    rabbitMoveReset();
+                    if(rabbit.moveDirection==2 &&y>0){
+                        if(map[y-1][x] ===0)  rabbit.up  =true;
+                    }else if(rabbit.moveDirection==3){
+                        if(map[y+1][x] ===0) rabbit.down=true;
+                    }else moveCount=0;
+                }
             }
         }
         if( key.right  === true ) {
             if(map[y][x+1] ===0){
                 rabbitMoveReset();
                 rabbit.right =true;
-            }else rabbitMoveReset();
+            }else {
+                rabbitMoveReset();
+                if(rabbit.moveDirection==2 &&y>0){
+                    if(map[y-1][x] ===0)  rabbit.up  =true;
+                }else if(rabbit.moveDirection==3){
+                    if(map[y+1][x] ===0) rabbit.down=true;
+                }else moveCount=0;
+            }
         }
                 
         if( key.up     === true ) {
@@ -321,7 +395,14 @@ function rabbitMove(){//うさぎを移動する関数
                 if(map[y-1][x] ===0){
                     rabbitMoveReset();
                     rabbit.up=true;
-                }else rabbitMoveReset();
+                }else {
+                    rabbitMoveReset();
+                    if(rabbit.moveDirection==0 && x>0){
+                        if(map[y][x-1] ===0) rabbit.left  =true;
+                    }else if(rabbit.moveDirection==1){
+                        if(map[y][x+1] ===0)rabbit.right =true;
+                    }else moveCount=0;
+                }
             }
         }
             
@@ -329,21 +410,49 @@ function rabbitMove(){//うさぎを移動する関数
             if(map[y+1][x] ===0){
                 rabbitMoveReset();
                 rabbit.down=true;
-            }else rabbitMoveReset();
+            }else {
+                rabbitMoveReset();
+                if(rabbit.moveDirection==0 && x>0){
+                    if(map[y][x-1] ===0) rabbit.left  =true;
+                }else if(rabbit.moveDirection==1){
+                    if(map[y][x+1] ===0)rabbit.right =true;
+                }else moveCount=0;
+            }
         }
     }else{
-        moveCount--;
         if(rabbit.left==true){
             rabbit.x -=rabbit.speed;
+            rabbit.moveDirection=0;
+            if(moveCount ==16){
+               rabbit.img.src =rabbit.leftImg;
+                
+            }else if(moveCount==8){
+                rabbit.img.src =rabbit.leftImg2;
+            }
             if(x>0){
-                if(mapObjects[y][x-1] ===1){
+                if(mapObjects[y][x-1] ===1){//草と接触したら、草を消す
                     mapObjects[y][x-1]=0;
                     ctx.clearRect((x-1)*32+blank, y*32, (x-1)*32+blank+32, y*32+32);
                 }
             }
+            if(key.right==true){
+               
+                moveCount=16-moveCount;
+                rabbitMoveReset();
+                rabbit.right=true;
+                rabbit.img.src ='images/rightRabbit1.png';
+            }
         }
         if(rabbit.right==true){
+            alert(moveCount);
             rabbit.x += rabbit.speed;
+            rabbit.moveDirection=1;
+            if(moveCount ==16){
+                rabbit.img.src =rabbit.rightImg;
+                 
+             }else if(moveCount==8){
+                 rabbit.img.src =rabbit.rightImg2;
+             }
             if(mapObjects[y][x+1] ===1){
                 mapObjects[y][x+1]=0;
                 ctx.clearRect((x+1)*32+blank, y*32, (x+1)*32+blank+32, y*32+32);
@@ -351,7 +460,13 @@ function rabbitMove(){//うさぎを移動する関数
         }
         if(rabbit.up==true){
             rabbit.y -= rabbit.speed;
-            
+            rabbit.moveDirection=2;
+            if(moveCount ==16){
+                rabbit.img.src =rabbit.upImg;
+                 
+             }else if(moveCount==8){
+                 rabbit.img.src =rabbit.upImg2;
+             }
             if(y>0){
                 try{
                     if(mapObjects[y-1][x] ===1){
@@ -367,6 +482,13 @@ function rabbitMove(){//うさぎを移動する関数
         }
         if(rabbit.down==true){
             rabbit.y += rabbit.speed;
+            rabbit.moveDirection=3;
+            if(moveCount ==16){
+                rabbit.img.src =rabbit.downImg;
+                 
+             }else if(moveCount==8){
+                 rabbit.img.src =rabbit.downImg2;
+             }
             try{
                 if(mapObjects[y+1][x] ===1){
                     mapObjects[y+1][x]=0;
@@ -377,6 +499,8 @@ function rabbitMove(){//うさぎを移動する関数
             }
             
         }
+        moveCount--;
+        
     }   
 }
 
@@ -387,6 +511,7 @@ function rabbitMoveReset(){//移動完了時のうさぎの挙動リセット
     rabbit.up=false;
     rabbit.down=false;
 }
+
 
 
 
