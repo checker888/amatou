@@ -1,5 +1,31 @@
 let objectSize =32;// 1マスの正方形の幅
-let blank =320;
+let blank =320;//マップの描画位置調整
+let scene=1 //画面遷移　タイトル0 ゲーム1
+let enemyPositionX =blank +32*9;
+let enemyPositionY =320;
+//マップのデータ生成
+let map = [
+	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+	[1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1],
+	[1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1],
+	[1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1],
+	[1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1],
+	[1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+	[1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1],
+	[1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1],
+	[1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1],
+	[1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1],
+	[1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1],
+	[1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1],
+	[1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1],
+	[1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1],
+	[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+];
 
 //衝突判定
 //マップの上を動く
@@ -25,8 +51,8 @@ mapchip.src = 'images/mapChip.png';
 let rabbit = new Object();//うさぎのオブジェクト生成
 rabbit.img = new Image();
 rabbit.img.src ='images/testrabbit3.png';
-rabbit.x=blank +32+32*8;
-rabbit.y=blank +64;
+rabbit.x=blank +32*9;
+rabbit.y=blank +32*2;
 rabbit.left  =false;
 rabbit.right =false;
 rabbit.up    =false;
@@ -34,41 +60,86 @@ rabbit.down  =false;
 rabbit.speed =2;
 
 
+class foxClass {
+    constructor(x,y,movePattern,imgsrc){
+        this.x=x;
+        this.y=y;
+        this.movePattern =movePattern;
+        this.img = new Image();
+        this.img.src = imgsrc;
+        this.speed =2;
+        this.left=false;
+        this.right=false;
+        this.up=false;
+        this.down=false;
+        this.moveCount = objectSize/this.speed;
+    }
+    move(){
+        let fx = (this.x/32)-(blank/32);
+        let fy = this.y/32;
+        
+        if(this.moveCount==0){
+            this.moveCount=objectSize/this.speed;
+            let moveDirection = Math.floor(Math.random()*4);//0左 1右 2上 3下
+           
+            if(moveDirection==0){//左
+                if(fx>0) {
+                    if(map[fy][fx-1] ===0){
+                        this.moveReset();
+                        this.left=true;
+                    }else {
+                        this.moveReset();
+                        this.moveCount=0;
+                    }
+                }
+            }else if(moveDirection ==1){//右
+                if(map[fy][fx+1] ===0){
+                    this.moveReset();
+                    this.right=true;
+                }else {
+                    this.moveReset();
+                    this.moveCount=0;
+                }
+            }else if(moveDirection ==2){//上
+                if(fy>0){
+                    if(map[fy-1][fx] ===0){
+                        this.moveReset();
+                        this.up=true;
+                    }else {
+                        this.moveReset();
+                        this.moveCount=0;
+                    }
+                }
+                
+            }else if(moveDirection ==3){//下
+                 if(map[fy+1][fx] ===0){
+                    this.moveReset();
+                    this.down=true;
+                }else {
+                    this.moveReset();
+                    this.moveCount=0;
+                }
+            }
+        }else{
+            this.moveCount--;
+            if(this.left==true) this.x-=2;
+            if(this.right==true) this.x+=2;
+            if(this.up==true) this.y-=2;
+            if(this.down==true) this.y+=2;
 
-
-//マップの作成
-let map = [
-	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-	[1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1],
-	[1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1],
-	[1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1],
-	[1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1],
-	[1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-	[1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1],
-	[1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1],
-	[1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1],
-	[1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1],
-	[1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1],
-	[1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1],
-	[1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1],
-	[1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1],
-	[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-];
-
-
-
-
-
-
-
-
-
-
+        }
+    }
+    move2(){
+        
+    }
+    moveReset(){
+        this.left=false;
+        this.right=false;
+        this.up=false;
+        this.down=false;
+    }
+}
+let yellowFox = new foxClass(enemyPositionX,enemyPositionY,1,'images/yellowFox.png');
 
 
 
@@ -85,85 +156,91 @@ grass.img = new Image();
 grass.img.src ='images/grass.png';
 
 let mapObjects = [
-	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-	[1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1],
-	[1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1],
-	[1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1],
-	[1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1],
-	[1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-	[1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1],
-	[1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1],
-	[1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1],
-	[1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1],
-	[1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1],
-	[1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1],
-	[1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1],
-	[1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1],
-	[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0],
+	[0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0],
+	[0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0],
+	[0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0],
+	[0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0],
+	[0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0],
+	[0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+	[0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+	[0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0],
+	[0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0],
+	[0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0],
+	[0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0],
+	[0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0],
+	[0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0],
+	[0, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+	[0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0],
+	[0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0],
+	[0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
 ];
 
-//let pics_src = new Array("images/kusa.png","images/halfkusa.png","");
 
 
 
-//マップチップを表示（ひょうじ）する
-addEventListener('load', function() {
-    for (let y=0; y<map.length; y++) {
-        for (let x=0; x<map[y].length; x++) {
-            if ( map[y][x] === 0 ) ctx.drawImage( mapchip, 0, 0, 16, 16, 32 * x +blank, 32 * y , 32, 32 );
-            if ( map[y][x] === 1 ) {
-                ctx.drawImage( mapchip, 16, 0, 16, 16, 32 * x +blank, 32 * y , 32, 32 );
-                ctx.drawImage( grass.img, 0, 0, 32, 32, 32 * x +blank, 32 * y , 32, 32 );
-            }
-        }
-    }
-}, false);
+
+
+
+
+
+
+
+
 
 function draw() {//常時繰り返し呼び出される関数
-    
-
-
-    
-	//キーボードが押された時、keydownfunc関数を呼び出す
-	addEventListener( "keydown", keydownfunc );
-    rabbitMove();
-   
-	
-	//マップを描画
-    for (let y=0; y<map.length; y++) {
-        for (let x=0; x<map[y].length; x++) {
-            if ( map[y][x] === 0 ) {
-                ctx.drawImage( mapchip, 0, 0, 16, 16, 32 * x +blank, 32 * y , 32, 32 );
-                if(mapObjects[y][x]===0){
-                    ctx.drawImage( grass.img, 0, 0, 32, 32, 32 * x +blank, 32 * y , 32, 32 );
-                }
-                
-            }
-            if ( map[y][x] === 1 ) {
-                ctx.drawImage( mapchip, 16, 0, 16, 16, 32 * x +blank, 32 * y ,32, 32 );
-            }
-        }
+    if(scene==0){
+        drawTitle();
+    }else if(scene==1){
+        drawGame();
     }
-    //うさぎを描画
-    
-    //うさぎを移動する関数を呼び出す
-    ctx.drawImage( rabbit.img, rabbit.x, rabbit.y );
 
 
-    //main関数を呼び出しループさせる
-	requestAnimationFrame( draw );
+
+
 }
 requestAnimationFrame( draw );
+
+function drawTitle(){
+
+}
+
+function drawGame(){
+    //キーボードが押された時、keydownfunc関数を呼び出す
+	addEventListener( "keydown", keydownfunc );
+    rabbitMove();//うさぎを移動する関数を呼び出す
+    //foxMove();//きつねを移動する関数を呼び出す
+    yellowFox.move();
+    drawMap();//マップを描画
+   
+
+    
+    
+    ctx.drawImage( rabbit.img, rabbit.x, rabbit.y );//うさぎを描画
+    ctx.drawImage( yellowFox.img, yellowFox.x, yellowFox.y );//うさぎを描画
+
+    enemyCollider();//敵との衝突判定
+
+
+   
+	requestAnimationFrame( draw ); //draw関数を呼び出しループさせる
+}
+
+
+
+
+
+
+
+
 
 //キーが押されたときに呼び出される関数
 function keydownfunc( event ) {
 
-    //押されたボタンに割り当てられた数値をkey_codeに代入
+
     let key_code = event.keyCode;
 
     if( key_code === 37 ){//左キーが押されたとき、key.leftをtrueにする
@@ -201,7 +278,24 @@ function keydownfunc( event ) {
     //--この中は完成時削除する
 }
 
-function rabbitMove(){
+
+function drawMap(){
+    for (let y=0; y<map.length; y++) {
+        for (let x=0; x<map[y].length; x++) {
+            if ( map[y][x] === 0 ) {
+                ctx.drawImage( mapchip, 0, 0, 16, 16, 32 * x +blank, 32 * y , 32, 32 );
+                if(mapObjects[y][x]===1){
+                    ctx.drawImage( grass.img, 0, 0, 32, 32, 32 * x +blank, 32 * y , 32, 32 );
+                }
+            }
+            if ( map[y][x] === 1 ) {
+                ctx.drawImage( mapchip, 16, 0, 16, 16, 32 * x +blank, 32 * y ,32, 32 );
+            }
+        }
+    }
+}
+
+function rabbitMove(){//うさぎを移動する関数
     let x = (rabbit.x/32)-(blank/32);
     let y = rabbit.y/32;
     if(moveCount==0){
@@ -242,16 +336,16 @@ function rabbitMove(){
         if(rabbit.left==true){
             rabbit.x -=rabbit.speed;
             if(x>0){
-                if(mapObjects[y][x-1] ===0){
-                    mapObjects[y][x-1]=1;
+                if(mapObjects[y][x-1] ===1){
+                    mapObjects[y][x-1]=0;
                     ctx.clearRect((x-1)*32+blank, y*32, (x-1)*32+blank+32, y*32+32);
                 }
             }
         }
         if(rabbit.right==true){
             rabbit.x += rabbit.speed;
-            if(mapObjects[y][x+1] ===0){
-                mapObjects[y][x+1]=1;
+            if(mapObjects[y][x+1] ===1){
+                mapObjects[y][x+1]=0;
                 ctx.clearRect((x+1)*32+blank, y*32, (x+1)*32+blank+32, y*32+32);
             }
         }
@@ -260,8 +354,8 @@ function rabbitMove(){
             
             if(y>0){
                 try{
-                    if(mapObjects[y-1][x] ===0){
-                        mapObjects[y-1][x]=1;
+                    if(mapObjects[y-1][x] ===1){
+                        mapObjects[y-1][x]=0;
                         ctx.clearRect(x*32+blank, (y-1)*32, x*32+blank+32, (y-1)*32+32);
                     }
                 }catch{
@@ -274,8 +368,8 @@ function rabbitMove(){
         if(rabbit.down==true){
             rabbit.y += rabbit.speed;
             try{
-                if(mapObjects[y+1][x] ===0){
-                    mapObjects[y+1][x]=1;
+                if(mapObjects[y+1][x] ===1){
+                    mapObjects[y+1][x]=0;
                     ctx.clearRect(x*32+blank, (y+1)*32, x*32+blank+32, (y+1)*32+32);
                 }
             }catch{
@@ -287,9 +381,24 @@ function rabbitMove(){
 }
 
 
-function rabbitMoveReset(){
+function rabbitMoveReset(){//移動完了時のうさぎの挙動リセット
     rabbit.left=false;
     rabbit.right=false;
     rabbit.up=false;
     rabbit.down=false;
+}
+
+
+
+
+
+
+
+
+
+function enemyCollider(){
+    if(rabbit.x<=yellowFox.x+31 && rabbit.x+31>=yellowFox.x && rabbit.y<=yellowFox.y+31 &&rabbit.y+31>=yellowFox.y){
+        ctx.clearRect(0,0,1000,700);
+    }
+
 }
