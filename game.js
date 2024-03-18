@@ -1,9 +1,10 @@
 let objectSize =32;// 1マスの正方形の幅
 let blank =320;//マップの描画位置調整
 let scene=0; //画面遷移　タイトル0 ゲーム1
-let enemyPositionX =blank +objectSize*9;//敵の初期位置基準
-let enemyPositionY =320;
-let score=0;
+let enemyPositionX =blank +objectSize*9;//敵の初期位置基準x
+let enemyPositionY =320;//y
+let score=0;//スコア
+let moveCount =16;//1マスの移動にかかるカウント数(moveCount * キャラのスピード)
 //canvasの設定
 let canvas = document.getElementById( 'canvas' );
 canvas.width = 1088;    //canvasの横幅
@@ -15,10 +16,9 @@ let font = new FontFace('美咲ゴシック', 'url(fonts/misaki_gothic_2nd.ttf)'
 
 
 
-
-
-
 //マップのデータ生成
+let mapchip = new Image();
+mapchip.src = 'images/mapChip.png';
 let map = [
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 	[1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1],
@@ -42,25 +42,28 @@ let map = [
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 
-//衝突判定
-//マップの上を動く
+let key = new Object();//キー入力に関するオブジェクト生成
+key.up = false;
+key.down = false;
+key.right = false;
+key.left = false;
 
 
 
+let grass = new Object();//草のオブジェクト生成
+grass.img = new Image();
+grass.img.src ='images/grass2.png';
 
+let carrot = new Object();//ニンジンのオブジェクト生成
+carrot.img = new Image();
+carrot.img.src ='images/itemCarrot.png';
+carrot.has =false;
 
-//画像のオブジェクトを作る
-let moveCount =16;
-
-
-let mapchip = new Image();
-mapchip.src = 'images/mapChip.png';
 
 
 let rabbit = new Object();//うさぎのオブジェクト生成
+
 rabbit.img = new Image();
-
-
 rabbit.leftImg  ='images/leftRabbit1.png';
 rabbit.leftImg2 ='images/leftRabbit2.png';
 rabbit.rightImg ='images/rightRabbit1.png';
@@ -69,11 +72,11 @@ rabbit.upImg    ='images/upRabbit1.png';
 rabbit.upImg2   ='images/upRabbit2.png';
 rabbit.downImg  ='images/downRabbit1.png';
 rabbit.downImg2 ='images/downRabbit2.png';
-
 rabbit.img.src =rabbit.upImg;
 
 rabbit.x=blank +32*9;
 rabbit.y=blank +32*2;
+
 rabbit.moveDirection=2;//0左 1右 2上 3下
 rabbit.left  =false;
 rabbit.right =false;
@@ -86,6 +89,8 @@ class foxClass {
     constructor(x,y,nowimg){
         this.x=x;
         this.y=y;
+        this.speed=2;
+
         this.img = new Image();
         this.img.src = nowimg;
         this.leftImg;
@@ -96,11 +101,12 @@ class foxClass {
         this.upImg2;
         this.downImg;
         this.downImg2;
-        this.speed =2;
+
         this.left=false;
         this.right=false;
         this.up=false;
         this.down=false;
+        
         this.moveCount = objectSize/this.speed;
     }
     move(){
@@ -157,7 +163,7 @@ class foxClass {
                 }else if(this.moveCount ==8){
                     this.img.src =this.leftImg2;
                 }
-                this.x-=2;
+                this.x-=this.speed;
             }
             if(this.right==true) {
                 if(this.moveCount==16){
@@ -165,7 +171,7 @@ class foxClass {
                 }else if(this.moveCount ==8){
                     this.img.src =this.rightImg2;
                 }
-                this.x+=2;
+                this.x+=this.speed;
             }
             if(this.up==true) {
                 if(this.moveCount==16){
@@ -173,7 +179,7 @@ class foxClass {
                 }else if(this.moveCount ==8){
                     this.img.src =this.upImg2;
                 }
-                this.y-=2;
+                this.y-=this.speed;
             }
             if(this.down==true) {
                 if(this.moveCount==16){
@@ -181,8 +187,9 @@ class foxClass {
                 }else if(this.moveCount ==8){
                     this.img.src =this.downImg2;
                 }
-                this.y+=2;
+                this.y+=this.speed;
             }
+            
             this.moveCount--;
         }
     }
@@ -262,19 +269,10 @@ whiteFox.downImg2='images/downWhitefox2.png';
 
 
 
-let key = new Object();//キー入力に関するオブジェクト生成
-key.up = false;
-key.down = false;
-key.right = false;
-key.left = false;
 
 
 
-let grass = new Object();//草のオブジェクト生成
-grass.img = new Image();
-grass.img.src ='images/grass2.png';
-
-let mapObjects = [
+let mapObjects = [//マップに配置するアイテムの配列（値は下でランダムに決めてるのでここの中身の数字は関係ない
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0],
 	[0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0],
@@ -295,8 +293,23 @@ let mapObjects = [
 	[0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0],
 	[0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0],
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
 ];
+
+for (let y=0; y<map.length; y++) {//ランダムオブジェクト（アイテム）生成
+    for (let x=0; x<map[y].length; x++) {
+        if(map[y][x]===0){
+            let item=Math.floor(Math.random()*150)
+            if(item==2){
+                mapObjects[y][x]=2;//ニンジン 
+            }
+            else mapObjects[y][x]=1;//草
+        }else if(map[y][x]===1) mapObjects[y][x] =0;//壁にはオブジェクトを生成しない
+    }
+}
+
+
+
+
 
 
 
@@ -374,7 +387,26 @@ function drawScore(){
 }
 
 
-
+function drawMap(){
+    ctx.fillStyle = 'black';
+    ctx.fillRect(blank, 0, canvas.width, canvas.height);
+    for (let y=0; y<map.length; y++) {
+        for (let x=0; x<map[y].length; x++) {
+            if ( map[y][x] === 0 ) {
+                ctx.drawImage( mapchip, 0, 0, 16, 16, 32 * x +blank, 32 * y , 32, 32 );
+                if(mapObjects[y][x]===1){
+                    ctx.drawImage( grass.img, 0, 0, 1280, 1280, 32 * x +blank, 32 * y , 32, 32 );
+                }
+                if(mapObjects[y][x]===2){
+                    ctx.drawImage(carrot.img, 0, 0, 1280, 1280, 32 * x +blank, 32 * y , 32, 32 );
+                }
+            }
+            if ( map[y][x] === 1 ) {
+                ctx.drawImage( mapchip, 16, 0, 16, 16, 32 * x +blank, 32 * y ,32, 32 );
+            }
+        }
+    }
+}
 
 
 
@@ -420,23 +452,7 @@ function keydownfunc( event ) {
 }
 
 
-function drawMap(){
-    ctx.fillStyle = 'black';
-    ctx.fillRect(blank, 0, canvas.width, canvas.height);
-    for (let y=0; y<map.length; y++) {
-        for (let x=0; x<map[y].length; x++) {
-            if ( map[y][x] === 0 ) {
-                ctx.drawImage( mapchip, 0, 0, 16, 16, 32 * x +blank, 32 * y , 32, 32 );
-                if(mapObjects[y][x]===1){
-                    ctx.drawImage( grass.img, 0, 0, 1280, 1280, 32 * x +blank, 32 * y , 32, 32 );
-                }
-            }
-            if ( map[y][x] === 1 ) {
-                ctx.drawImage( mapchip, 16, 0, 16, 16, 32 * x +blank, 32 * y ,32, 32 );
-            }
-        }
-    }
-}
+
 
 function rabbitMove(){//うさぎを移動する関数
     let x = (rabbit.x/32)-(blank/32);
@@ -514,13 +530,8 @@ function rabbitMove(){//うさぎを移動する関数
             }else if(moveCount==8-1){
                 rabbit.img.src =rabbit.leftImg2;
             }
-            if(x>0){
-                if(mapObjects[y][x-1] ===1){//草と接触したら、草を消す
-                    mapObjects[y][x-1]=0;
-                    getScore(100);
-                    ctx.clearRect((x-1)*32+blank, y*32, (x-1)*32+blank+32, y*32+32);
-                }
-            }
+            objectCollider(y,x-1);
+            
             
         }
         if(rabbit.right==true){
@@ -532,11 +543,7 @@ function rabbitMove(){//うさぎを移動する関数
              }else if(moveCount==8-1){
                  rabbit.img.src =rabbit.rightImg2;
              }
-            if(mapObjects[y][x+1] ===1){
-                mapObjects[y][x+1]=0;
-                getScore(100);
-                ctx.clearRect((x+1)*32+blank, y*32, (x+1)*32+blank+32, y*32+32);
-            }
+             objectCollider(y,x+1);
         }
         if(rabbit.up==true){
             rabbit.y -= rabbit.speed;
@@ -547,18 +554,7 @@ function rabbitMove(){//うさぎを移動する関数
              }else if(moveCount==8-1){
                  rabbit.img.src =rabbit.upImg2;
              }
-            if(y>0){
-                try{
-                    if(mapObjects[y-1][x] ===1){
-                        mapObjects[y-1][x]=0;
-                        getScore(100);
-                        ctx.clearRect(x*32+blank, (y-1)*32, x*32+blank+32, (y-1)*32+32);
-                    }
-                }catch{
-
-                }
-                
-            }
+             objectCollider(y-1,x);
             
         }
         if(rabbit.down==true){
@@ -570,15 +566,7 @@ function rabbitMove(){//うさぎを移動する関数
              }else if(moveCount==8-1){
                  rabbit.img.src =rabbit.downImg2;
              }
-            try{
-                if(mapObjects[y+1][x] ===1){
-                    mapObjects[y+1][x]=0;
-                    getScore(100);
-                    ctx.clearRect(x*32+blank, (y+1)*32, x*32+blank+32, (y+1)*32+32);
-                }
-            }catch{
-
-            }
+             objectCollider(y+1,x);
             
         }
         moveCount--;
@@ -594,7 +582,23 @@ function rabbitMoveReset(){//移動完了時のうさぎの挙動リセット
 }
 
 
-
+function objectCollider(y,x){
+    if(x>0 && y>0){
+        try{
+            if(mapObjects[y][x] ===1){//草と接触したら、草を消す
+                mapObjects[y][x]=0;
+                getScore(100);
+                ctx.clearRect((x)*32+blank, (y)*32, (x)*32+blank+32, (y)*32+32);
+            }
+            if(mapObjects[y][x] ===2){//ニンジンと接触したときの処理
+                mapObjects[y][x]=0;
+                getScore(1000);
+                ctx.clearRect((x)*32+blank, (y)*32, (x)*32+blank+32, (y)*32+32);
+                carrot.has=true;
+            }
+        }catch{}
+    }
+}
 
 function enemyCollider(){//敵との衝突判定
     
