@@ -116,45 +116,47 @@ class foxClass { //きつねのクラス生成
         if(this.moveCount==0){
             this.moveCount=objectSize/this.speed;
             this.moveDirection = Math.floor(Math.random()*4);//0左 1右 2上 3下
-           
-            if(this.moveDirection==0){//左
-                if(fx>0) {
-                    if(map[fy][fx-1] ===0){
+            try{
+                if(this.moveDirection==0){//左
+                    if(fx>0) {
+                        if(map[fy][fx-1] ===0){
+                            this.moveReset();
+                            this.left=true;
+                        }else {
+                            this.moveReset();
+                            this.moveCount=0;
+                        }
+                    }
+                }else if(this.moveDirection ==1){//右
+                    if(map[fy][fx+1] ===0){
                         this.moveReset();
-                        this.left=true;
+                        this.right=true;
+                    }else {
+                        this.moveReset();
+                        this.moveCount=0;
+                    }
+                }else if(this.moveDirection ==2){//上
+                    if(fy>0){
+                        if(map[fy-1][fx] ===0){
+                            this.moveReset();
+                            this.up=true;
+                        }else {
+                            this.moveReset();
+                            this.moveCount=0;
+                        }
+                    }
+                    
+                }else if(this.moveDirection ==3){//下
+                     if(map[fy+1][fx] ===0){
+                        this.moveReset();
+                        this.down=true;
                     }else {
                         this.moveReset();
                         this.moveCount=0;
                     }
                 }
-            }else if(this.moveDirection ==1){//右
-                if(map[fy][fx+1] ===0){
-                    this.moveReset();
-                    this.right=true;
-                }else {
-                    this.moveReset();
-                    this.moveCount=0;
-                }
-            }else if(this.moveDirection ==2){//上
-                if(fy>0){
-                    if(map[fy-1][fx] ===0){
-                        this.moveReset();
-                        this.up=true;
-                    }else {
-                        this.moveReset();
-                        this.moveCount=0;
-                    }
-                }
-                
-            }else if(this.moveDirection ==3){//下
-                 if(map[fy+1][fx] ===0){
-                    this.moveReset();
-                    this.down=true;
-                }else {
-                    this.moveReset();
-                    this.moveCount=0;
-                }
-            }
+            }catch{}
+                   
         }else{
 
             if(this.left==true) {
@@ -362,18 +364,19 @@ function drawGame(){
     
     rabbitMove();//うさぎを移動する関数を呼び出す
     yellowFox.move();
-    grayFox.move();
-    redFox.move();
-    whiteFox.move();
+    //grayFox.move();
+    //redFox.move();
+    //whiteFox.move();
     drawMap();//マップを描画
    
 
     
     ctx.drawImage( rabbit.img,    0, 0, 1280, 1280,rabbit.x,    rabbit.y ,  32,32);//うさぎを描画
     ctx.drawImage( yellowFox.img, 0, 0, 1280, 1280,yellowFox.x, yellowFox.y,32,32 );//きつねを描画
-    ctx.drawImage( grayFox.img, 0, 0, 1280, 1280,grayFox.x, grayFox.y,32,32 );//きつねを描画
-    ctx.drawImage( whiteFox.img, 0, 0, 1280, 1280,whiteFox.x, whiteFox.y,32,32 );//きつねを描画
-    ctx.drawImage( redFox.img, 0, 0, 1280, 1280,redFox.x, redFox.y,32,32 );//きつねを描画
+    //ctx.drawImage( grayFox.img, 0, 0, 1280, 1280,grayFox.x, grayFox.y,32,32 );//きつねを描画
+    //ctx.drawImage( redFox.img, 0, 0, 1280, 1280,redFox.x, redFox.y,32,32 );//きつねを描画
+    //ctx.drawImage( whiteFox.img, 0, 0, 1280, 1280,whiteFox.x, whiteFox.y,32,32 );//きつねを描画
+    
    
     enemyCollider();//敵との衝突判定
 
