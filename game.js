@@ -199,11 +199,13 @@ class foxClass { //きつねのクラス生成
         }
     }
     move2(){
-        let fx = (this.x/32)-(blank/32);
-        let fy = this.y/32;
-        
+        this.moveCount--;
+        const fx2 = (this.x/32)-(blank/32);
+        const fy2 = this.y/32;
+        let rx=Math.floor(rabbit.x/32)-(blank/32);
+        let ry=Math.floor(rabbit.y/32)
         if(this.moveCount==0){
-          
+          bfs(fx2,fy2,rx,ry);
         }
 //ここにアルゴリズム書いてく
 
@@ -226,14 +228,14 @@ class foxClass { //きつねのクラス生成
 
 //黄色いきつね
 let yellowFox = new foxClass(enemyPositionX,enemyPositionY,'images/rightYellowFox1.png');
-yellowFox.leftImg='images/leftYellowfox1.png';
-yellowFox.leftImg2='images/leftYellowfox2.png';
-yellowFox.rightImg='images/rightYellowfox1.png';
-yellowFox.rightImg2='images/rightYellowfox2.png';
-yellowFox.upImg='images/upYellowfox1.png';
-yellowFox.upImg2='images/upYellowfox2.png';
-yellowFox.downImg='images/downYellowfox1.png';
-yellowFox.downImg2='images/downYellowfox2.png';
+yellowFox.leftImg='images/leftYellowFox1.png';
+yellowFox.leftImg2='images/leftYellowFox2.png';
+yellowFox.rightImg='images/rightYellowFox1.png';
+yellowFox.rightImg2='images/rightYellowFox2.png';
+yellowFox.upImg='images/upYellowFox1.png';
+yellowFox.upImg2='images/upYellowFox2.png';
+yellowFox.downImg='images/downYellowFox1.png';
+yellowFox.downImg2='images/downYellowFox2.png';
 
 //灰色きつね
 let grayFox = new foxClass(enemyPositionX+objectSize,enemyPositionY,'images/rightGrayFox1.png');
@@ -241,10 +243,10 @@ grayFox.leftImg='images/leftGrayFox1.png';
 grayFox.leftImg2='images/leftGrayFox2.png';
 grayFox.rightImg='images/rightGrayFox1.png';
 grayFox.rightImg2='images/rightGrayFox2.png';
-grayFox.upImg='images/upGrayfox1.png';
-grayFox.upImg2='images/upGrayfox1.png';
-grayFox.downImg='images/downGrayfox1.png';
-grayFox.downImg2='images/downGrayfox2.png';
+grayFox.upImg='images/upGrayFox1.png';
+grayFox.upImg2='images/upGrayFox1.png';
+grayFox.downImg='images/downGrayFox1.png';
+grayFox.downImg2='images/downGrayFox2.png';
 
 //赤色きつね
 let redFox = new foxClass(enemyPositionX,enemyPositionY-objectSize,'images/rightRedFox1.png');
@@ -265,8 +267,8 @@ whiteFox.rightImg='images/rightWhiteFox1.png';
 whiteFox.rightImg2='images/rightWhiteFox2.png';
 whiteFox.upImg='images/upWhiteFox1.png';
 whiteFox.upImg2='images/upWhiteFox2.png';
-whiteFox.downImg='images/downWhitefox1.png';
-whiteFox.downImg2='images/downWhitefox2.png';
+whiteFox.downImg='images/downWhiteFox1.png';
+whiteFox.downImg2='images/downWhiteFox2.png';
 
 
 
@@ -471,8 +473,6 @@ function keydownfunc( event ) {
 
 
     if( scene==0 && key_code === 32 ){//スペースキーで画面遷移
-       // bfs(4,4,10,10);
-       // alert(routes);
         scene=1;
     } 
 }
@@ -641,5 +641,88 @@ function getScore(p){
 
 
 
+const INF = 1000000000;
+const dx = [-1, 1, 0, 0];
+const dy = [0, 0, -1, 1];
+const width = 20;
+const height = 20;
 
+function bfs(sx, sy, gx, gy) {
+   
+    const prev = [];
+    const dist=[];
+    for(let y =0;y<height;y++){
+        dist[y] =[];
+        for(let x =0;x<width;x++){
+            dist[y][x]=INF;
+        }
+    }
+    dist[sy][sx] = 0;
+  
+    const queue = [{ x: sx, y: sy }];
+    while (queue.length > 0) {
+        const cur = queue.shift();
+
+
+        if (cur.x === gx && cur.y === gy) break;
+    
+
+        for (let i = 0; i < 4; i++) {
+            const nx = cur.x + dx[i];
+            const ny = cur.y + dy[i];
+      
+            if (nx < 0 || nx >= width || ny < 0 || ny >= height) {
+                //alert("範囲外");
+                continue;
+            }
+            if (map[ny][nx] === 1) {
+                //alert("壁");
+                continue;
+            }
+            if (dist[ny][nx] !== INF) {
+                //alert("もう見た");
+                continue;
+            }
+     
+        dist[ny][nx] = dist[cur.y][cur.x] + 1;
+        //alert(dist[ny][nx]);
+        queue.push({ x: nx, y: ny });
+        prev[cur.y][cur.x] = cur;
+
+        }
+    
+    } 
+    let cx=nx;
+    let cy=ny;
+    let routes = [];
+    while(dist[cy][cx]!=0){
+        for(let i=0;i<4;i++){
+            const px = cx + dx[i];
+            const py = cy + dy[i];
+            if (px < 0 || px >= width || py < 0 || py >= height) {
+                //alert("範囲外");
+                continue;
+            }
+            if (map[py][px] === 1) {
+                //alert("壁");
+                continue;
+            }
+            if (dist[py][px] === INF) {
+                //alert("見なくていい");
+                continue;
+            }
+            if(dist[py][px]==dist[cy][cx]+1){
+                routes.unshift({ x: cx, y: cy });
+                cx=px;
+                cy=py;
+            }
+          
+          
+        }
+    }
+  
+  alert("できた");
+ 
+ 
+}
 
