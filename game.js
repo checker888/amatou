@@ -1,7 +1,4 @@
 
-
-
-
 const objectSize =32;// 1マスの正方形の幅
 const blank =320;//マップの描画位置調整
 let scene=0; //画面遷移　タイトル0 ゲーム1
@@ -14,6 +11,10 @@ let canvas = document.getElementById( 'canvas' );
 canvas.width = 1080;    //canvasの横幅
 canvas.height = 640;    //canvasの縦幅
 
+//音楽データの生成
+const bgm = new Audio('sounds/bgm.mp3');
+bgm.play();
+
 //コンテキストを取得
 let ctx = canvas.getContext( '2d' );
 let font = new FontFace('美咲ゴシック', 'url(fonts/misaki_gothic_2nd.ttf)');
@@ -21,6 +22,10 @@ let font = new FontFace('美咲ゴシック', 'url(fonts/misaki_gothic_2nd.ttf)'
 let routes = [];
 let startTime ;
 let r = Math.floor(Math.random()*5);
+
+//タイトル画像データ生成
+let titleRabbit = new Image();
+titleRabbit.src = 'images/titleRabbit.png';
 
 //マップのデータ生成
 let mapImg = new Image();
@@ -141,7 +146,7 @@ class foxClass { //きつねのクラス生成
         let fx = (this.x/32)-(blank/32);
         let fy = this.y/32;
         
-        if(this.moveCount==0){
+        if(this.moveCount==0){//移動カウントが0のとき、移動の方向を決める
             this.moveCount=objectSize/this.speed;
             this.moveDirection = Math.floor(Math.random()*4);//0左 1右 2上 3下
             try{
@@ -185,9 +190,9 @@ class foxClass { //きつねのクラス生成
                 }
             }catch{}
                    
-        }else{
+        }else{//移動カウントが0より大きい時移動を行う
 
-            if(this.left==true) {
+            if(this.left==true) {//左アニメーション
                 if(this.moveCount==16){
                     this.img =this.leftImg;
                 }else if(this.moveCount ==8){
@@ -195,7 +200,7 @@ class foxClass { //きつねのクラス生成
                 }
                 this.x-=this.speed;
             }
-            if(this.right==true) {
+            if(this.right==true) {//右アニメーション
                 if(this.moveCount==16){
                     this.img =this.rightImg;
                 }else if(this.moveCount ==8){
@@ -203,7 +208,7 @@ class foxClass { //きつねのクラス生成
                 }
                 this.x+=this.speed;
             }
-            if(this.up==true) {
+            if(this.up==true) {//上アニメーション
                 if(this.moveCount==16){
                     this.img =this.upImg;
                 }else if(this.moveCount ==8){
@@ -211,7 +216,7 @@ class foxClass { //きつねのクラス生成
                 }
                 this.y-=this.speed;
             }
-            if(this.down==true) {
+            if(this.down==true) {//下アニメーション
                 if(this.moveCount==16){
                     this.img =this.downImg;
                 }else if(this.moveCount ==8){
@@ -223,18 +228,18 @@ class foxClass { //きつねのクラス生成
             this.moveCount--;
         }
     }
-    move2(){
-        let fx2 = (this.x/32)-(blank/32);
-        let fy2 = this.y/32;
+    move2(){//きつねの移動関数（幅優先探索を用いたおいかけ
+        let fx2 = (this.x/32)-(blank/32);//きつねの現在位置x
+        let fy2 = this.y/32;//きつねの現在位置y
         
-        let rx=Math.floor(rabbit.x/32)-(blank/32);
-        let ry=Math.floor(rabbit.y/32)
+        let rx=Math.floor(rabbit.x/32)-(blank/32);//うさぎの現在位置x
+        let ry=Math.floor(rabbit.y/32)//うさぎの現在位置y
         
         if(this.moveCount2==0){
             if(this.chaseCount==0){
             
                this.moveI =0;
-                bfs(fx2,fy2,rx,ry);
+                bfs(fx2,fy2,rx,ry);//幅優先探索する関数を呼び出す
                 this.chaseCount = Math.floor(Math.random()*3+3);
                 for(let i=0;i<=5;i++){
                     this.moveDirection2[i]=-1;
@@ -503,12 +508,17 @@ for (let y=0; y<map.length; y++) {//ランダムオブジェクト（アイテ�
 
 
 
-
+let bgmplayer =false;
 function draw() {//常時繰り返し呼び出される関数
     //キーボードが押された時、keydownfunc関数を呼び出す
 	addEventListener( "keydown", keydownfunc );
+    if(!bgmplayer) {
+        bgm.play();
+        bgmplayer=!bgmplayer;
+    }
     
     if(scene==0){
+        
         drawTitle();//タイトル画面
     }else if(scene==1){
         drawGame();//ゲーム画面
@@ -521,8 +531,7 @@ function draw() {//常時繰り返し呼び出される関数
 }
 requestAnimationFrame( draw );
 
-let titleRabbit = new Image();
-titleRabbit.src = 'images/titleRabbit.png';
+
 function drawTitle(){//タイトル画面
     ctx.fillStyle = 'black';
     ctx.fillRect(blank, 0, canvas.width, canvas.height);
@@ -721,6 +730,7 @@ function keydownfunc( event ) {
 
     if( scene==0 && key_code === 32 ){//スペースキーで画面遷移
         startTime = performance.now();
+        bgm.play();
         scene=1;
     } 
     if( scene==2 && key_code === 32 ){//スペースキーで画面遷移
@@ -903,16 +913,16 @@ function getScore(p){
 
 
 
-const INF = 1000000000;
-const dx = [-1, 1, 0, 0];
+const INF = 1000000000;//はじめに配列全体を適当な数で満たす
+const dx = [-1, 1, 0, 0];//(dx,dy)で全ての移動方向を表現
 const dy = [0, 0, -1, 1];
-const width = 20;
-const height = 20;
+const width = 20;//マップ横幅
+const height = 20;//マップ縦幅
  
 
-function bfs(sx, sy, gx, gy) {
+function bfs(sx, sy, gx, gy) {//幅優先探索関数
 
-    const dist=[];//移動距離を格納する変数のしょきせ
+    const dist=[];//移動距離を格納する変数の初期設定
     for(let y =0;y<height;y++){
         dist[y] =[];
 
@@ -927,7 +937,7 @@ function bfs(sx, sy, gx, gy) {
         const cur = queue.shift();
 
 
-        if (cur.x === gx && cur.y === gy) break;
+        if (cur.x === gx && cur.y === gy) break;//ゴールに辿り着いたらループを抜ける
     
 
         for (let i = 0; i < 4; i++) {
@@ -972,15 +982,13 @@ function bfs(sx, sy, gx, gy) {
             }
         }
     }
-
     //for(let i=0;i<routes.length;i++){
       //  alert(routes[i].x+" "+routes[i].y);
     //}
-    
-     
-        
- 
 }
+
+
+
 
 
 
