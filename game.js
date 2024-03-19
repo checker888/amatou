@@ -77,6 +77,7 @@ let carrot = new Object();//ニンジンのオブジェクト生成
 carrot.img = new Image();
 carrot.img.src ='images/itemCarrot.png';
 carrot.count =0;
+carrot.pop = 50;
 
 let candy = new Object();
 candy.img = new Image();
@@ -488,7 +489,7 @@ const CARROT =2;
 for (let y=0; y<map.length; y++) {//ランダムオブジェクト（アイテム）生成
     for (let x=0; x<map[y].length; x++) {
         if(map[y][x]===0){
-            let item=Math.floor(Math.random()*150)
+            let item=Math.floor(Math.random()*carrot.pop)
             if(item==2){
                 mapObjects[y][x]=CARROT;//ニンジン 
             }
@@ -607,7 +608,7 @@ function grassRepop(){
             if(grassRepopCount[y][x]>0){
                 grassRepopCount[y][x]--;
                 if(grassRepopCount[y][x]==0){
-                    let r=Math.floor(Math.random()*100)
+                    let r=Math.floor(Math.random()*carrot.pop)
                     if(r==2)mapObjects[y][x]=CARROT;
                     else mapObjects[y][x]=GRASS;
                 }
@@ -1093,6 +1094,7 @@ function reset(){
     yellowFox.moveCount = objectSize/yellowFox.speed;
     yellowFox.moveCount2 = objectSize/yellowFox.speed;
     yellowFox.moveI =0;
+
 
 
 
