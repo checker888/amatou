@@ -1,5 +1,5 @@
-let objectSize =32;// 1マスの正方形の幅
-let blank =320;//マップの描画位置調整
+const objectSize =32;// 1マスの正方形の幅
+const blank =320;//マップの描画位置調整
 let scene=0; //画面遷移　タイトル0 ゲーム1
 let enemyPositionX =blank +objectSize*9;//敵の初期位置基準x
 let enemyPositionY =320;//y
@@ -72,7 +72,7 @@ rabbit.upImg    ='images/upRabbit1.png';
 rabbit.upImg2   ='images/upRabbit2.png';
 rabbit.downImg  ='images/downRabbit1.png';
 rabbit.downImg2 ='images/downRabbit2.png';
-rabbit.img.src =rabbit.upImg;
+rabbit.img.src =rabbit.upImg;//初期画像
 
 rabbit.x=blank +32*9;
 rabbit.y=blank +32*2;
@@ -85,7 +85,7 @@ rabbit.down  =false;
 rabbit.speed =2;
 
 
-class foxClass {
+class foxClass { //きつねのクラス生成
     constructor(x,y,nowimg){
         this.x=x;
         this.y=y;
@@ -106,10 +106,10 @@ class foxClass {
         this.right=false;
         this.up=false;
         this.down=false;
-        
+
         this.moveCount = objectSize/this.speed;
     }
-    move(){
+    move(){//きつねの移動関数1 (完全ランダムに動く)
         let fx = (this.x/32)-(blank/32);
         let fy = this.y/32;
         
@@ -210,7 +210,7 @@ class foxClass {
 
         
     }
-    moveReset(){
+    moveReset(){//きつねの移動リセット
         this.left=false;
         this.right=false;
         this.up=false;
@@ -219,7 +219,7 @@ class foxClass {
 }
 
 
-
+//黄色いきつね
 let yellowFox = new foxClass(enemyPositionX,enemyPositionY,'images/rightYellowFox1.png');
 yellowFox.leftImg='images/leftYellowfox1.png';
 yellowFox.leftImg2='images/leftYellowfox2.png';
@@ -230,6 +230,7 @@ yellowFox.upImg2='images/upYellowfox2.png';
 yellowFox.downImg='images/downYellowfox1.png';
 yellowFox.downImg2='images/downYellowfox2.png';
 
+//灰色きつね
 let grayFox = new foxClass(enemyPositionX+objectSize,enemyPositionY,'images/rightGrayFox1.png');
 grayFox.leftImg='images/leftGrayFox1.png';
 grayFox.leftImg2='images/leftGrayFox2.png';
@@ -240,6 +241,7 @@ grayFox.upImg2='images/upGrayfox1.png';
 grayFox.downImg='images/downGrayfox1.png';
 grayFox.downImg2='images/downGrayfox2.png';
 
+//赤色きつね
 let redFox = new foxClass(enemyPositionX,enemyPositionY-objectSize,'images/rightRedFox1.png');
 redFox.leftImg='images/leftRedFox1.png';
 redFox.leftImg2='images/leftRedFox2.png';
@@ -250,6 +252,7 @@ redFox.upImg2='images/upRedFox2.png';
 redFox.downImg='images/downRedFox1.png';
 redFox.downImg2='images/downRedFox2.png';
 
+//白きつね
 let whiteFox = new foxClass(enemyPositionX+objectSize,enemyPositionY-objectSize,'images/rightWhiteFox1.png');
 whiteFox.leftImg='images/leftWhiteFox1.png';
 whiteFox.leftImg2='images/leftWhiteFox2.png';
@@ -328,10 +331,10 @@ function draw() {//常時繰り返し呼び出される関数
 	addEventListener( "keydown", keydownfunc );
     
     if(scene==0){
-        drawTitle();
+        drawTitle();//タイトル画面
     }else if(scene==1){
-        drawGame();
-        drawScore();
+        drawGame();//ゲーム画面
+        drawScore();//スコア表示
         
     }
 
@@ -341,7 +344,7 @@ function draw() {//常時繰り返し呼び出される関数
 }
 requestAnimationFrame( draw );
 
-function drawTitle(){
+function drawTitle(){//タイトル画面
     ctx.fillStyle = 'black';
     ctx.fillRect(blank, 0, canvas.width, canvas.height);
     // フォントのロードが完了したら描画を開始
