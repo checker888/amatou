@@ -610,7 +610,7 @@ function drawScore(){
 
     let endTime = performance.now();
     let min = Math.floor((endTime-startTime)/(60000));
-    let sec = Math.floor((endTime-startTime)/1000);
+    let sec = Math.floor(((endTime-startTime)/1000)%60);
     if(min<10){
         min="0"+min;
     }
@@ -862,7 +862,7 @@ function objectCollider(y,x){
         try{
             if(mapObjects[y][x] ===1){//草と接触したら、草を消す
                 mapObjects[y][x]=-1;
-                grassRepopCount[y][x]=480;
+                grassRepopCount[y][x]=480*4;
                 getScore(grass.point);
                 ctx.clearRect((x)*32+blank, (y)*32, (x)*32+blank+32, (y)*32+32);
             }
