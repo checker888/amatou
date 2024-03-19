@@ -1,4 +1,7 @@
 
+
+
+
 const objectSize =32;// 1マスの正方形の幅
 const blank =320;//マップの描画位置調整
 let scene=0; //画面遷移　タイトル0 ゲーム1
@@ -8,7 +11,7 @@ let score=0;//スコア
 let moveCount =16;//1マスの移動にかかるカウント数(moveCount * キャラのスピード)
 //canvasの設定
 let canvas = document.getElementById( 'canvas' );
-canvas.width = 1088;    //canvasの横幅
+canvas.width = 1080;    //canvasの横幅
 canvas.height = 640;    //canvasの縦幅
 
 //コンテキストを取得
@@ -17,6 +20,7 @@ let font = new FontFace('美咲ゴシック', 'url(fonts/misaki_gothic_2nd.ttf)'
 
 let routes = [];
 let startTime ;
+let r = Math.floor(Math.random()*5);
 
 //マップのデータ生成
 let mapImg = new Image();
@@ -64,6 +68,12 @@ let carrot = new Object();//ニンジンのオブジェクト生成
 carrot.img = new Image();
 carrot.img.src ='images/itemCarrot.png';
 carrot.count =0;
+
+let candy = new Object();
+candy.img = new Image();
+candy.img.src ='images/itemCandy.png';
+candy.count =0;
+
 
 let rabbit = new Object();//うさぎのオブジェクト生成
 
@@ -224,17 +234,14 @@ class foxClass { //きつねのクラス生成
             if(this.chaseCount==0){
             
                this.moveI =0;
-               //alert(fx2+" "+fy2+" "+rx+" "+ry);
                 bfs(fx2,fy2,rx,ry);
                 this.chaseCount = Math.floor(Math.random()*3+3);
-                //alert("a");
                 for(let i=0;i<=5;i++){
                     this.moveDirection2[i]=-1;
                     //alert(this.moveDirection2[i]);
                 }
                 let x;
                 let y;
-               // alert(this.chaseCount);
                 for(let i=0;i<=this.chaseCount;i++){
                     
                     if(i==0) {
@@ -246,8 +253,6 @@ class foxClass { //きつねのクラス生成
                         y =routes[i-1].y;
 
                     } 
-
-                //alert(x+" "+routes[i].x);
                 if(x-routes[i].x==1){
                     this.moveDirection2[i]=0;
 
@@ -261,8 +266,6 @@ class foxClass { //きつねのクラス生成
                 if(y-routes[i].y==-1){
                     this.moveDirection2[i]=3;
                 }
-                //alert(this.moveDirection2[i]);
-               // alert(this.moveDirection2[i]);
                 
             }
 
@@ -270,11 +273,8 @@ class foxClass { //きつねのクラス生成
         }
         this.chaseCount--;
         //try{
-                //alert(this.moveDirection2[this.moveI]);
                 fx2 = (this.x/32)-(blank/32);
                 fy2 = this.y/32;
-                //alert(map[fy2][fx2]);
-                //alert(this.moveDirection2[this.moveI]);
                 if(this.moveDirection2[this.moveI]==0){//左
                     if(map[fy2][fx2-1] ===0){
                         this.moveReset();
@@ -296,10 +296,7 @@ class foxClass { //きつねのクラス生成
                         this.moveCount2=0;
                     }
                 }else if(this.moveDirection2[this.moveI] ==2){//上 
-                    //alert(map[fx2][fy2-1]);
-                    //alert("a");
                     if(map[fy2-1][fx2] ===0){
-                        //alert("いける");
                         this.moveReset();
                         this.up=true;    
                     }else {
@@ -538,24 +535,24 @@ function drawTitle(){//タイトル画面
 
         ctx.font = '72px 美咲ゴシック'; // 使用するフォントを指定
         ctx.fillStyle = '#E0712C';
-        ctx.fillText('GRASSRUNNER', 500, 160); // Canvas上にテキストを描画
+        ctx.fillText('GRASSCORRIDOR', 480, 160); // Canvas上にテキストを描画
 
         ctx.drawImage( titleRabbit, 0, 0, 1280, 1280, 555, 200, 300, 300);
     });
        
 
 }
-let r = Math.floor(Math.random()*5);
+
 function drawGame(){
     
     rabbitMove();//うさぎを移動する関数を呼び出す
     yellowFox.move();
     grayFox.move2();   
     whiteFox.move();
-    if(redFox.moveCount==16 && redFox.moveCount2==16){     
-         r = Math.floor(Math.random()*2);
+    if(redFox.moveCount==16 && redFox.moveCount2==16){
+         r = Math.floor(Math.random()*3);
     }
-    if(r==0){
+    if(r==0 || r==1){
         redFox.move2();
     }
     else{
@@ -696,25 +693,25 @@ function keydownfunc( event ) {
 
     let key_code = event.keyCode;
 
-    if( key_code === 37 ){//左キーが押されたとき、key.leftをtrueにする
+    if( key_code === 37 || key_code ===65){//左キーが押されたとき、key.leftをtrueにする
         key.left  = true;
         key.up    = false;
         key.down  = false;
         key.right = false;
     } 		
-    if( key_code === 38 ){//上キー
+    if( key_code === 38 || key_code ===87){//上キー
         key.left  = false;
         key.up    = true;
         key.down  = false;
         key.right = false;
     } 		
-    if( key_code === 39 ){//右キー
+    if( key_code === 39 || key_code ===68){//右キー
         key.left  = false;
         key.up    = false;
         key.down  = false;
         key.right = true;
     } 	
-    if( key_code === 40 ){//下キー
+    if( key_code === 40 || key_code ===83){//下キー
         key.left  = false;
         key.up    = false;
         key.down  = true;
@@ -726,10 +723,10 @@ function keydownfunc( event ) {
         startTime = performance.now();
         scene=1;
     } 
-    //if( scene==2 && key_code === 32 ){//スペースキーで画面遷移
-    //   reset();
-    //    scene=0;
-    //} 
+    if( scene==2 && key_code === 32 ){//スペースキーで画面遷移
+        reset();
+        scene=0;
+    } 
 }
 
 function rabbitMove(){//うさぎを移動する関数
@@ -878,16 +875,16 @@ function objectCollider(y,x){
 
 function enemyCollider(){//敵との衝突判定
     
-    if(rabbit.x<=yellowFox.x+31 && rabbit.x+31>=yellowFox.x && rabbit.y<=yellowFox.y+31 &&rabbit.y+31>=yellowFox.y){
+    if(rabbit.x<=yellowFox.x+objectSize-1 && rabbit.x+objectSize-1>=yellowFox.x && rabbit.y<=yellowFox.y+objectSize-1 &&rabbit.y+objectSize-1>=yellowFox.y){
         scene=2;
     }
-    if(rabbit.x<=grayFox.x+31 && rabbit.x+31>=grayFox.x && rabbit.y<=grayFox.y+31 &&rabbit.y+31>=grayFox.y){
+    if(rabbit.x<=grayFox.x+objectSize-1 && rabbit.x+objectSize-1>=grayFox.x && rabbit.y<=grayFox.y+objectSize-1 &&rabbit.y+objectSize-1>=grayFox.y){
         scene=2;
     }
-    if(rabbit.x<=whiteFox.x+31 && rabbit.x+31>=whiteFox.x && rabbit.y<=whiteFox.y+31 &&rabbit.y+31>=whiteFox.y){
+    if(rabbit.x<=whiteFox.x+objectSize-1 && rabbit.x+objectSize-1>=whiteFox.x && rabbit.y<=whiteFox.y+objectSize-1 &&rabbit.y+objectSize-1>=whiteFox.y){
         scene=2;
     }
-    if(rabbit.x<=redFox.x+31 && rabbit.x+31>=redFox.x && rabbit.y<=redFox.y+31 &&rabbit.y+31>=redFox.y){
+    if(rabbit.x<=redFox.x+objectSize-1 && rabbit.x+objectSize-1>=redFox.x && rabbit.y<=redFox.y+objectSize-1 &&rabbit.y+objectSize-1>=redFox.y){
         scene=2;
     }
 
@@ -903,6 +900,9 @@ function getScore(p){
 
 
 
+
+
+
 const INF = 1000000000;
 const dx = [-1, 1, 0, 0];
 const dy = [0, 0, -1, 1];
@@ -911,10 +911,8 @@ const height = 20;
  
 
 function bfs(sx, sy, gx, gy) {
-    //alert(gx+" "+gy);
-   
-    //const prev = [];
-    const dist=[];
+
+    const dist=[];//移動距離を格納する変数のしょきせ
     for(let y =0;y<height;y++){
         dist[y] =[];
 
@@ -925,7 +923,7 @@ function bfs(sx, sy, gx, gy) {
     dist[sy][sx] = 0;
   
     const queue = [{ x: sx, y: sy }];
-    while (queue.length > 0) {
+    while (queue.length > 0) {//調べられる要素の数だけ調べる
         const cur = queue.shift();
 
 
@@ -936,13 +934,13 @@ function bfs(sx, sy, gx, gy) {
             let nx = cur.x + dx[i];
             let ny = cur.y + dy[i];
       
-            if (nx < 0 || nx >= width || ny < 0 || ny >= height) {//alert("範囲外");
+            if (nx < 0 || nx >= width || ny < 0 || ny >= height) {//範囲外;
                 continue;
             }
-            if (map[ny][nx] === 1) {//alert("壁");
+            if (map[ny][nx] === 1) {//壁;
                 continue;
             }
-            if (dist[ny][nx] !== INF) {//alert("もう見た");
+            if (dist[ny][nx] !== INF) {//もう見た;
                 continue;
             }
             
@@ -956,21 +954,18 @@ function bfs(sx, sy, gx, gy) {
     let cy=gy;
     while(dist[cy][cx]!=0){
         for(let i=0;i<4;i++){
-            //alert (cx+" "+cy);
             const px = cx + dx[i];
             const py = cy + dy[i];
-            //alert (px+" "+py);
-            if (px < 0 || px >= width || py < 0 || py >= height) {//alert("範囲外");
+            if (px < 0 || px >= width || py < 0 || py >= height) {//範囲外;
                 continue;
             }
-            if (map[py][px] === 1) {//alert("壁");
+            if (map[py][px] === 1) {//壁
                 continue;
             }
-            if (dist[py][px] === INF) {//alert("見なくていい");
+            if (dist[py][px] === INF) {//もう見なくていい
                 continue;
             }
             if(dist[py][px]==dist[cy][cx]-1){
-               // alert("近い");
                 routes.unshift({ x: cx, y: cy });
                 cx=px;
                 cy=py;
@@ -987,4 +982,123 @@ function bfs(sx, sy, gx, gy) {
  
 }
 
-context.rotate( 50 * Math.PI / 180 ) ;
+
+
+
+
+
+
+
+
+
+
+
+
+function reset(){
+    score=0;
+    moveCount =16;
+    routes = [];
+    key.up = false;
+    key.down = false;
+    key.right = false;
+    key.left = false;   
+    carrot.count =0;
+    candy.count =0;
+    rabbit.img = rabbit.leftImg;
+    rabbit.x=blank +32*9;
+    rabbit.y=blank +32*2;   
+    rabbit.moveDirection=2;//0左 1右 2上 3下
+    rabbit.left  =false;
+    rabbit.right =false;
+    rabbit.up    =false;
+    rabbit.down  =false;
+    rabbit.speed =2;    
+
+
+    redFox.moveReset();
+    redFox.x=enemyPositionX;
+    redFox.y=enemyPositionY-objectSize;
+    redFox.speed=2;
+    redFox.left=false;
+    redFox.right=false;
+    redFox.up=false;
+    redFox.down=false;
+    redFox.moveCount = objectSize/redFox.speed;
+    redFox.moveCount2 = objectSize/redFox.speed;
+    redFox.moveI =0;
+
+    grayFox.moveReset();
+    grayFox.x=enemyPositionX+objectSize;
+    grayFox.y=enemyPositionY;
+    grayFox.speed=2;
+    grayFox.left=false;
+    grayFox.right=false;
+    grayFox.up=false;
+    grayFox.down=false;
+    grayFox.moveCount = objectSize/grayFox.speed;
+    grayFox.moveCount2 = objectSize/grayFox.speed;
+    grayFox.moveI =0;
+
+    whiteFox.moveReset();
+    whiteFox.x=enemyPositionX+objectSize;
+    whiteFox.y=enemyPositionY-objectSize;
+    whiteFox.speed=2;
+    whiteFox.left=false;
+    whiteFox.right=false;
+    whiteFox.up=false;
+    whiteFox.down=false;
+    whiteFox.moveCount = objectSize/ whiteFox.speed;
+    whiteFox.moveCount2 = objectSize/ whiteFox.speed;
+    whiteFox.moveI =0;
+
+    yellowFox.moveReset();
+    yellowFox.x=enemyPositionX;
+    yellowFox.y=enemyPositionY;
+    yellowFox.speed=2;
+    yellowFox.left=false;
+    yellowFox.right=false;
+    yellowFox.up=false;
+    yellowFox.down=false;
+    yellowFox.moveCount = objectSize/yellowFox.speed;
+    yellowFox.moveCount2 = objectSize/yellowFox.speed;
+    yellowFox.moveI =0;
+
+
+
+    for (let y=0; y<map.length; y++) {//ランダムオブジェクト（アイテム）生成
+        for (let x=0; x<map[y].length; x++) {
+            if(map[y][x]===0){
+                let item=Math.floor(Math.random()*150)
+                if(item==2){
+                    mapObjects[y][x]=CARROT;//ニンジン 
+                }
+                else mapObjects[y][x]=GRASS;//草
+            }else if(map[y][x]===1) mapObjects[y][x] =0;//壁にはオブジェクトを生成しない
+        }
+    }
+
+
+grassRepopCount = [//マップに草が復活するまでのカウント配列
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+];
+
+}
