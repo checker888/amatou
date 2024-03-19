@@ -16,6 +16,7 @@ let ctx = canvas.getContext( '2d' );
 let font = new FontFace('美咲ゴシック', 'url(fonts/misaki_gothic_2nd.ttf)');
 
 let routes = [];
+let startTime ;
 
 //マップのデータ生成
 let mapImg = new Image();
@@ -428,7 +429,6 @@ whiteFox.downImg2.src='images/downWhiteFox2.png';
 
 
 
-let grassRepopCount=[];
 
 let mapObjects = [//マップに配置するアイテムの配列（値は下でランダムに決めてるのでここの中身の数字は関係ない
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -450,6 +450,30 @@ let mapObjects = [//マップに配置するアイテムの配列（値は下で
 	[0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0],
 	[0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0],
 	[0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+];
+
+
+let grassRepopCount = [//マップに草が復活するまでのカウント配列
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ];
 const GRASS =1;
@@ -539,6 +563,7 @@ function drawGame(){
     } 
     
     hasItem();
+    grassRepop();
     
     drawMap();//マップを描画
    
@@ -566,13 +591,37 @@ function hasItem(){
     
 
 }
-
+function grassRepop(){
+    for (let y=0; y<map.length; y++) {
+        for (let x=0; x<map[y].length; x++) {
+            if(grassRepopCount[y][x]>0){
+                grassRepopCount[y][x]--;
+                if(grassRepopCount[y][x]==0)mapObjects[y][x]=1;
+            }
+        }
+    }
+}
 
 function drawScore(){
     ctx.font = '36px 美咲ゴシック'; // 使用するフォントを指定
     ctx.fillStyle = '#A7CC65';
     ctx.fillText("score", 970, 100); // Canvas上にテキストを描画
     ctx.fillText(score, 1000, 160); // Canvas上にテキストを描画
+
+    let endTime = performance.now();
+    let min = Math.floor((endTime-startTime)/(60000));
+    let sec = Math.floor((endTime-startTime)/1000);
+    if(min<10){
+        min="0"+min;
+    }
+    if(sec<10){
+        sec="0"+sec;
+    }
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText("time", 970, 300); // Canvas上にテキストを描画
+    ctx.fillText(min+":"+sec, 970, 360); // Canvas上にテキストを描画
+    //ctx.fillText(min, 970, 360); // Canvas上にテキストを描画
+
 }
 
 function drawMap(){
@@ -674,6 +723,7 @@ function keydownfunc( event ) {
 
 
     if( scene==0 && key_code === 32 ){//スペースキーで画面遷移
+        startTime = performance.now();
         scene=1;
     } 
     //if( scene==2 && key_code === 32 ){//スペースキーで画面遷移
@@ -812,6 +862,7 @@ function objectCollider(y,x){
         try{
             if(mapObjects[y][x] ===1){//草と接触したら、草を消す
                 mapObjects[y][x]=-1;
+                grassRepopCount[y][x]=480;
                 getScore(grass.point);
                 ctx.clearRect((x)*32+blank, (y)*32, (x)*32+blank+32, (y)*32+32);
             }
@@ -936,3 +987,4 @@ function bfs(sx, sy, gx, gy) {
  
 }
 
+context.rotate( 50 * Math.PI / 180 ) ;
