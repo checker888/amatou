@@ -13,7 +13,10 @@ canvas.height = 640;    //canvasの縦幅
 
 //音楽データの生成
 const bgm = new Audio('sounds/bgm.mp3');
-bgm.play();
+const getItem = new Audio('sounds/getItem.mp3');
+const gameoverSound = new Audio('sounds/gameover.mp3');
+const getGrass = new Audio('sounds/getGrass.mp3');
+
 
 //コンテキストを取得
 let ctx = canvas.getContext( '2d' );
@@ -670,6 +673,7 @@ function drawMapChip(){
 }
 let grave = new Image();
 grave.src = 'images/grave.png';
+
 function drawGameOver(){
     ctx.fillStyle = 'black';
     ctx.fillRect(blank, 0, canvas.width, canvas.height);
@@ -678,12 +682,16 @@ function drawGameOver(){
         document.fonts.add(loadedFont);
         ctx.font = '36px 美咲ゴシック'; // 使用するフォントを指定
         ctx.fillStyle = 'red';
-        ctx.fillText('GAME OVER', 630, 560); // Canvas上にテキストを描画
+        ctx.fillText('GAME OVER', 630, 540); // Canvas上にテキストを描画
 
         ctx.font = '60px 美咲ゴシック'; // 使用するフォントを指定
         ctx.fillStyle = '#A7CC65';
         ctx.fillText('SCORE', 640, 200); // Canvas上にテキストを描画
-        ctx.fillText(score, 770, 320);
+        ctx.fillText(score, 660, 320);
+
+        ctx.font = '30px 美咲ゴシック'; // 使用するフォントを指定
+        ctx.fillStyle = 'white';
+        ctx.fillText('Go back with space key', 550, 610); // Canvas上にテキストを描画
 
         ctx.drawImage( grave, 0, 0, 1280, 1280, 330, 180, 300, 300);
     });
@@ -870,11 +878,13 @@ function objectCollider(y,x){
             if(mapObjects[y][x] ===1){//草と接触したら、草を消す
                 mapObjects[y][x]=-1;
                 grassRepopCount[y][x]=480*4;
+                getGrass.play();
                 getScore(grass.point);
                 ctx.clearRect((x)*32+blank, (y)*32, (x)*32+blank+32, (y)*32+32);
             }
             if(mapObjects[y][x] ===2){//ニンジンと接触したときの処理
                 mapObjects[y][x]=0;
+                getItem.play();
                 getScore(1000);
                 ctx.clearRect((x)*32+blank, (y)*32, (x)*32+blank+32, (y)*32+32);
                 carrot.count+=320;
@@ -886,15 +896,19 @@ function objectCollider(y,x){
 function enemyCollider(){//敵との衝突判定
     
     if(rabbit.x<=yellowFox.x+objectSize-1 && rabbit.x+objectSize-1>=yellowFox.x && rabbit.y<=yellowFox.y+objectSize-1 &&rabbit.y+objectSize-1>=yellowFox.y){
+        gameoverSound.play();
         scene=2;
     }
     if(rabbit.x<=grayFox.x+objectSize-1 && rabbit.x+objectSize-1>=grayFox.x && rabbit.y<=grayFox.y+objectSize-1 &&rabbit.y+objectSize-1>=grayFox.y){
+        gameoverSound.play();
         scene=2;
     }
     if(rabbit.x<=whiteFox.x+objectSize-1 && rabbit.x+objectSize-1>=whiteFox.x && rabbit.y<=whiteFox.y+objectSize-1 &&rabbit.y+objectSize-1>=whiteFox.y){
+        gameoverSound.play();
         scene=2;
     }
     if(rabbit.x<=redFox.x+objectSize-1 && rabbit.x+objectSize-1>=redFox.x && rabbit.y<=redFox.y+objectSize-1 &&rabbit.y+objectSize-1>=redFox.y){
+        gameoverSound.play();
         scene=2;
     }
 
