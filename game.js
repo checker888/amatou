@@ -17,8 +17,11 @@ let font = new FontFace('美咲ゴシック', 'url(fonts/misaki_gothic_2nd.ttf)'
 
 
 //マップのデータ生成
+let mapImg = new Image();
+mapImg.src = 'images/mapImg.png';
 let mapchip = new Image();
 mapchip.src = 'images/mapChip.png';
+const WALL =1;//配列mapの1は通れない壁
 let map = [
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 	[1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1],
@@ -30,7 +33,7 @@ let map = [
 	[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
 	[1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1],
 	[1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1],
-	[1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1],
+	[1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1],
 	[1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1],
 	[1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1],
 	[1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1],
@@ -276,7 +279,6 @@ whiteFox.downImg2='images/downWhitefox2.png';
 
 
 
-
 let mapObjects = [//マップに配置するアイテムの配列（値は下でランダムに決めてるのでここの中身の数字は関係ない
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0],
@@ -299,15 +301,17 @@ let mapObjects = [//マップに配置するアイテムの配列（値は下で
 	[0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0],
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ];
+const GRASS =1;
+const CARROT =2;
 
 for (let y=0; y<map.length; y++) {//ランダムオブジェクト（アイテム）生成
     for (let x=0; x<map[y].length; x++) {
         if(map[y][x]===0){
             let item=Math.floor(Math.random()*150)
             if(item==2){
-                mapObjects[y][x]=2;//ニンジン 
+                mapObjects[y][x]=CARROT;//ニンジン 
             }
-            else mapObjects[y][x]=1;//草
+            else mapObjects[y][x]=GRASS;//草
         }else if(map[y][x]===1) mapObjects[y][x] =0;//壁にはオブジェクトを生成しない
     }
 }
@@ -364,18 +368,18 @@ function drawGame(){
     
     rabbitMove();//うさぎを移動する関数を呼び出す
     yellowFox.move();
-    //grayFox.move();
-    //redFox.move();
-    //whiteFox.move();
+    grayFox.move();
+    redFox.move();
+    whiteFox.move();
     drawMap();//マップを描画
    
 
     
     ctx.drawImage( rabbit.img,    0, 0, 1280, 1280,rabbit.x,    rabbit.y ,  32,32);//うさぎを描画
     ctx.drawImage( yellowFox.img, 0, 0, 1280, 1280,yellowFox.x, yellowFox.y,32,32 );//きつねを描画
-    //ctx.drawImage( grayFox.img, 0, 0, 1280, 1280,grayFox.x, grayFox.y,32,32 );//きつねを描画
-    //ctx.drawImage( redFox.img, 0, 0, 1280, 1280,redFox.x, redFox.y,32,32 );//きつねを描画
-    //ctx.drawImage( whiteFox.img, 0, 0, 1280, 1280,whiteFox.x, whiteFox.y,32,32 );//きつねを描画
+    ctx.drawImage( grayFox.img, 0, 0, 1280, 1280,grayFox.x, grayFox.y,32,32 );//きつねを描画
+    ctx.drawImage( redFox.img, 0, 0, 1280, 1280,redFox.x, redFox.y,32,32 );//きつねを描画
+    ctx.drawImage( whiteFox.img, 0, 0, 1280, 1280,whiteFox.x, whiteFox.y,32,32 );//きつねを描画
     
    
     enemyCollider();//敵との衝突判定
@@ -392,8 +396,25 @@ function drawScore(){
     ctx.fillText(score, 1000, 160); // Canvas上にテキストを描画
 }
 
-
 function drawMap(){
+    ctx.fillStyle = 'black';
+    ctx.fillRect(blank, 0, canvas.width, canvas.height);
+    ctx.drawImage( mapImg, 0, 0, 640, 640, blank, 0  ,640, 640 );
+    for (let y=0; y<map.length; y++) {
+        for (let x=0; x<map[y].length; x++) {
+            if ( map[y][x] === 0 ) {
+                if(mapObjects[y][x]===1){
+                    ctx.drawImage( grass.img, 0, 0, 1280, 1280, 32 * x +blank, 32 * y , 32, 32 );
+                }
+                if(mapObjects[y][x]===2){
+                    ctx.drawImage(carrot.img, 0, 0, 1280, 1280, 32 * x +blank, 32 * y , 32, 32 );
+                }
+            }
+        }
+    }
+}
+
+function drawMapChip(){
     ctx.fillStyle = 'black';
     ctx.fillRect(blank, 0, canvas.width, canvas.height);
     for (let y=0; y<map.length; y++) {
@@ -449,12 +470,11 @@ function keydownfunc( event ) {
     } 
 
 
-    if( scene==0 && key_code === 32 ){//スペースキーで止まる
-        
+    if( scene==0 && key_code === 32 ){//スペースキーで画面遷移
+       // bfs(4,4,10,10);
+       // alert(routes);
         scene=1;
-    
     } 
-   
 }
 
 
@@ -617,3 +637,9 @@ function enemyCollider(){//敵との衝突判定
 function getScore(p){
  score+=p;
 }
+
+
+
+
+
+
