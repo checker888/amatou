@@ -1,3 +1,4 @@
+
 const objectSize =32;// 1マスの正方形の幅
 const blank =320;//マップの描画位置調整
 let scene=0; //画面遷移　タイトル0 ゲーム1
@@ -56,11 +57,12 @@ key.left = false;
 let grass = new Object();//草のオブジェクト生成
 grass.img = new Image();
 grass.img.src ='images/grass2.png';
+grass.point=100;
 
 let carrot = new Object();//ニンジンのオブジェクト生成
 carrot.img = new Image();
 carrot.img.src ='images/itemCarrot.png';
-carrot.has =false;
+carrot.count =0;
 
 let rabbit = new Object();//うさぎのオブジェクト生成
 
@@ -491,11 +493,15 @@ function draw() {//常時繰り返し呼び出される関数
         drawGame();//ゲーム画面
         drawScore();//スコア表示
         
+    }else if(scene==2){
+        drawGameOver();
     }
     requestAnimationFrame( draw );
 }
 requestAnimationFrame( draw );
 
+let titleRabbit = new Image();
+titleRabbit.src = 'images/titleRabbit.png';
 function drawTitle(){//タイトル画面
     ctx.fillStyle = 'black';
     ctx.fillRect(blank, 0, canvas.width, canvas.height);
@@ -504,7 +510,13 @@ function drawTitle(){//タイトル画面
         document.fonts.add(loadedFont);
         ctx.font = '36px 美咲ゴシック'; // 使用するフォントを指定
         ctx.fillStyle = '#A7CC65';
-        ctx.fillText('PUSH SPACE KEY', 500, 320); // Canvas上にテキストを描画
+        ctx.fillText('PUSH SPACE KEY', 580, 560); // Canvas上にテキストを描画
+
+        ctx.font = '72px 美咲ゴシック'; // 使用するフォントを指定
+        ctx.fillStyle = '#E0712C';
+        ctx.fillText('GRASSRUNNER', 500, 160); // Canvas上にテキストを描画
+
+        ctx.drawImage( titleRabbit, 0, 0, 1280, 1280, 555, 200, 300, 300);
     });
        
 
@@ -526,7 +538,7 @@ function drawGame(){
         redFox.move();
     } 
     
-
+    hasItem();
     
     drawMap();//マップを描画
    
@@ -545,6 +557,16 @@ function drawGame(){
    
 	
 }
+
+function hasItem(){
+    if(carrot.count>0){
+        carrot.count--;
+        grass.point ++;
+    }else  grass.point=100;
+    
+
+}
+
 
 function drawScore(){
     ctx.font = '36px 美咲ゴシック'; // 使用するフォントを指定
@@ -591,6 +613,30 @@ function drawMapChip(){
         }
     }
 }
+let grave = new Image();
+grave.src = 'images/grave.png';
+function drawGameOver(){
+    ctx.fillStyle = 'black';
+    ctx.fillRect(blank, 0, canvas.width, canvas.height);
+    // フォントのロードが完了したら描画を開始
+    font.load().then(function(loadedFont) {
+        document.fonts.add(loadedFont);
+        ctx.font = '36px 美咲ゴシック'; // 使用するフォントを指定
+        ctx.fillStyle = 'red';
+        ctx.fillText('GAME OVER', 630, 560); // Canvas上にテキストを描画
+
+        ctx.font = '60px 美咲ゴシック'; // 使用するフォントを指定
+        ctx.fillStyle = '#A7CC65';
+        ctx.fillText('SCORE', 640, 200); // Canvas上にテキストを描画
+        ctx.fillText(score, 770, 320);
+
+        ctx.drawImage( grave, 0, 0, 1280, 1280, 330, 180, 300, 300);
+    });
+
+
+}
+
+
 
 
 
@@ -630,6 +676,10 @@ function keydownfunc( event ) {
     if( scene==0 && key_code === 32 ){//スペースキーで画面遷移
         scene=1;
     } 
+    //if( scene==2 && key_code === 32 ){//スペースキーで画面遷移
+    //   reset();
+    //    scene=0;
+    //} 
 }
 
 function rabbitMove(){//うさぎを移動する関数
@@ -761,15 +811,15 @@ function objectCollider(y,x){
     if(x>0 && y>0){
         try{
             if(mapObjects[y][x] ===1){//草と接触したら、草を消す
-                mapObjects[y][x]=0;
-                getScore(100);
+                mapObjects[y][x]=-1;
+                getScore(grass.point);
                 ctx.clearRect((x)*32+blank, (y)*32, (x)*32+blank+32, (y)*32+32);
             }
             if(mapObjects[y][x] ===2){//ニンジンと接触したときの処理
                 mapObjects[y][x]=0;
                 getScore(1000);
                 ctx.clearRect((x)*32+blank, (y)*32, (x)*32+blank+32, (y)*32+32);
-                carrot.has=true;
+                carrot.count+=320;
             }
         }catch{}
     }
@@ -778,7 +828,16 @@ function objectCollider(y,x){
 function enemyCollider(){//敵との衝突判定
     
     if(rabbit.x<=yellowFox.x+31 && rabbit.x+31>=yellowFox.x && rabbit.y<=yellowFox.y+31 &&rabbit.y+31>=yellowFox.y){
-        ctx.clearRect(0,0,1200,800); 
+        scene=2;
+    }
+    if(rabbit.x<=grayFox.x+31 && rabbit.x+31>=grayFox.x && rabbit.y<=grayFox.y+31 &&rabbit.y+31>=grayFox.y){
+        scene=2;
+    }
+    if(rabbit.x<=whiteFox.x+31 && rabbit.x+31>=whiteFox.x && rabbit.y<=whiteFox.y+31 &&rabbit.y+31>=whiteFox.y){
+        scene=2;
+    }
+    if(rabbit.x<=redFox.x+31 && rabbit.x+31>=redFox.x && rabbit.y<=redFox.y+31 &&rabbit.y+31>=redFox.y){
+        scene=2;
     }
 
 }
@@ -786,6 +845,9 @@ function enemyCollider(){//敵との衝突判定
 function getScore(p){
     score+=p;
 }
+
+
+
 
 
 
