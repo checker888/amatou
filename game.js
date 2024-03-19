@@ -16,6 +16,7 @@ const bgm = new Audio('sounds/bgm.mp3');
 const getItem = new Audio('sounds/getItem.mp3');
 const gameoverSound = new Audio('sounds/gameover.mp3');
 const getGrass = new Audio('sounds/getGrass.mp3');
+const clickSound = new Audio('sounds/clickSound.wav');
 
 
 //コンテキストを取得
@@ -605,7 +606,11 @@ function grassRepop(){
         for (let x=0; x<map[y].length; x++) {
             if(grassRepopCount[y][x]>0){
                 grassRepopCount[y][x]--;
-                if(grassRepopCount[y][x]==0)mapObjects[y][x]=1;
+                if(grassRepopCount[y][x]==0){
+                    let r=Math.floor(Math.random()*100)
+                    if(r==2)mapObjects[y][x]=CARROT;
+                    else mapObjects[y][x]=GRASS;
+                }
             }
         }
     }
@@ -737,12 +742,15 @@ function keydownfunc( event ) {
 
 
     if( scene==0 && key_code === 32 ){//スペースキーで画面遷移
+        clickSound.play();
         startTime = performance.now();
         bgm.play();
         scene=1;
     } 
     if( scene==2 && key_code === 32 ){//スペースキーで画面遷移
+        clickSound.play();
         reset();
+        
         scene=0;
     } 
 }
@@ -875,6 +883,7 @@ function rabbitMoveReset(){//移動完了時のうさぎの挙動リセット
 function objectCollider(y,x){
     if(x>0 && y>0){
         try{
+            
             if(mapObjects[y][x] ===1){//草と接触したら、草を消す
                 mapObjects[y][x]=-1;
                 grassRepopCount[y][x]=480*4;
