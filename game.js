@@ -544,8 +544,8 @@ function drawTitle(){//タイトル画面
     font.load().then(function(loadedFont) {
         document.fonts.add(loadedFont);
         ctx.font = '36px 美咲ゴシック'; // 使用するフォントを指定
-        ctx.fillStyle = '#A7CC65';
-        ctx.fillText('PUSH SPACE KEY', 580, 560); // Canvas上にテキストを描画
+        ctx.fillStyle = '#8FC7E4';
+        ctx.fillText('PUSH SPACE KEY', 580, 570); // Canvas上にテキストを描画
 
         ctx.font = '72px 美咲ゴシック'; // 使用するフォントを指定
         ctx.fillStyle = '#E0712C';
@@ -553,7 +553,7 @@ function drawTitle(){//タイトル画面
 
         ctx.drawImage( titleRabbit, 0, 0, 1280, 1280, 555, 200, 300, 300);
     });
-       
+
 
 }
 
@@ -620,8 +620,8 @@ function grassRepop(){
 function drawScore(){
     ctx.font = '36px 美咲ゴシック'; // 使用するフォントを指定
     ctx.fillStyle = '#A7CC65';
-    ctx.fillText("score", 970, 100); // Canvas上にテキストを描画
-    ctx.fillText(score, 1000, 160); // Canvas上にテキストを描画
+    ctx.fillText("score", 975, 100); // Canvas上にテキストを描画
+    ctx.fillText(score, 980, 160); // Canvas上にテキストを描画
 
     let endTime = performance.now();
     let min = Math.floor((endTime-startTime)/(60000));
@@ -633,8 +633,8 @@ function drawScore(){
         sec="0"+sec;
     }
     ctx.fillStyle = '#FFFFFF';
-    ctx.fillText("time", 970, 300); // Canvas上にテキストを描画
-    ctx.fillText(min+":"+sec, 970, 360); // Canvas上にテキストを描画
+    ctx.fillText("time", 985, 500); // Canvas上にテキストを描画
+    ctx.fillText(min+":"+sec, 975, 560); // Canvas上にテキストを描画
     //ctx.fillText(min, 970, 360); // Canvas上にテキストを描画
 
 }
