@@ -14,7 +14,7 @@ canvas.height = 640;    //canvasの縦幅
 let ctx = canvas.getContext( '2d' );
 let font = new FontFace('美咲ゴシック', 'url(fonts/misaki_gothic_2nd.ttf)');
 
-
+let routes = [];
 
 //マップのデータ生成
 let mapImg = new Image();
@@ -62,20 +62,26 @@ carrot.img = new Image();
 carrot.img.src ='images/itemCarrot.png';
 carrot.has =false;
 
-
-
 let rabbit = new Object();//うさぎのオブジェクト生成
 
+rabbit.leftImg = new Image();
+rabbit.leftImg.src  ='images/leftRabbit1.png';
+rabbit.leftImg2 = new Image();
+rabbit.leftImg2.src ='images/leftRabbit2.png';
+rabbit.rightImg = new Image();
+rabbit.rightImg.src ='images/rightRabbit1.png';
+rabbit.rightImg2 = new Image();
+rabbit.rightImg2.src='images/rightRabbit2.png';
+rabbit.upImg = new Image();
+rabbit.upImg.src    ='images/upRabbit1.png';
+rabbit.upImg2= new Image();
+rabbit.upImg2.src   ='images/upRabbit2.png';
+rabbit.downImg= new Image();
+rabbit.downImg.src  ='images/downRabbit1.png';
+rabbit.downImg2= new Image();
+rabbit.downImg2.src ='images/downRabbit2.png';
 rabbit.img = new Image();
-rabbit.leftImg  ='images/leftRabbit1.png';
-rabbit.leftImg2 ='images/leftRabbit2.png';
-rabbit.rightImg ='images/rightRabbit1.png';
-rabbit.rightImg2='images/rightRabbit2.png';
-rabbit.upImg    ='images/upRabbit1.png';
-rabbit.upImg2   ='images/upRabbit2.png';
-rabbit.downImg  ='images/downRabbit1.png';
-rabbit.downImg2 ='images/downRabbit2.png';
-rabbit.img.src =rabbit.upImg;//初期画像
+rabbit.img = rabbit.leftImg;
 
 rabbit.x=blank +32*9;
 rabbit.y=blank +32*2;
@@ -96,14 +102,14 @@ class foxClass { //きつねのクラス生成
 
         this.img = new Image();
         this.img.src = nowimg;
-        this.leftImg;
-        this.leftImg2;
-        this.rightImg;
-        this.rightImg2;
-        this.upImg;
-        this.upImg2;
-        this.downImg;
-        this.downImg2;
+        this.leftImg = new Image();
+        this.leftImg2= new Image();
+        this.rightImg= new Image();
+        this.rightImg2= new Image();
+        this.upImg= new Image();
+        this.upImg2= new Image();
+        this.downImg= new Image();
+        this.downImg2= new Image();
 
         this.left=false;
         this.right=false;
@@ -111,6 +117,7 @@ class foxClass { //きつねのクラス生成
         this.down=false;
 
         this.moveCount = objectSize/this.speed;
+        this.moveCount2 = objectSize/this.speed;
     }
     move(){//きつねの移動関数1 (完全ランダムに動く)
         let fx = (this.x/32)-(blank/32);
@@ -164,33 +171,33 @@ class foxClass { //きつねのクラス生成
 
             if(this.left==true) {
                 if(this.moveCount==16){
-                    this.img.src =this.leftImg;
+                    this.img =this.leftImg;
                 }else if(this.moveCount ==8){
-                    this.img.src =this.leftImg2;
+                    this.img =this.leftImg2;
                 }
                 this.x-=this.speed;
             }
             if(this.right==true) {
                 if(this.moveCount==16){
-                    this.img.src =this.rightImg;
+                    this.img =this.rightImg;
                 }else if(this.moveCount ==8){
-                    this.img.src =this.rightImg2;
+                    this.img =this.rightImg2;
                 }
                 this.x+=this.speed;
             }
             if(this.up==true) {
                 if(this.moveCount==16){
-                    this.img.src =this.upImg;
+                    this.img =this.upImg;
                 }else if(this.moveCount ==8){
-                    this.img.src =this.upImg2;
+                    this.img =this.upImg2;
                 }
                 this.y-=this.speed;
             }
             if(this.down==true) {
                 if(this.moveCount==16){
-                    this.img.src =this.downImg;
+                    this.img =this.downImg;
                 }else if(this.moveCount ==8){
-                    this.img.src =this.downImg2;
+                    this.img =this.downImg2;
                 }
                 this.y+=this.speed;
             }
@@ -199,23 +206,81 @@ class foxClass { //きつねのクラス生成
         }
     }
     move2(){
-        this.moveCount--;
+        
         const fx2 = (this.x/32)-(blank/32);
         const fy2 = this.y/32;
         let rx=Math.floor(rabbit.x/32)-(blank/32);
         let ry=Math.floor(rabbit.y/32)
-        if(this.moveCount==0){
-          bfs(fx2,fy2,rx,ry);
+        if(this.moveCount2==0){
+           
+            bfs(fx2,fy2,rx,ry);
+            
+            if(fx2-routes[0].x==1){
+                this.moveDirection2=0;
+            }
+            if(fx2-routes[0].x==-1){
+                this.moveDirection2=1;
+            }
+            if(fy2-routes[0].y==1){
+                this.moveDirection2=2;
+            }
+            if(fy2-routes[0].y==-1){
+                this.moveDirection2=3;
+            }
+
+
+            try{
+                if(this.moveDirection2==0){//左
+                        this.moveReset();
+                        this.left=true;
+                }else if(this.moveDirection2 ==1){//右
+                        this.moveReset();
+                        this.right=true;
+                }else if(this.moveDirection2 ==2){//上  
+                        this.moveReset();
+                        this.up=true;    
+                }else if(this.moveDirection2 ==3){//下
+                        this.moveReset();
+                        this.down=true;
+                }
+            }catch{}
+            this.moveCount2=16;
+        }else{
+            if(this.left==true) {
+                if(this.moveCount2==16){
+                    this.img =this.leftImg;
+                }else if(this.moveCount2 ==8){
+                    this.img =this.leftImg2;
+                }
+                this.x-=this.speed;
+            }
+            if(this.right==true) {
+                if(this.moveCount2==16){
+                    this.img =this.rightImg;
+                }else if(this.moveCount2 ==8){
+                    this.img =this.rightImg2;
+                }
+                this.x+=this.speed;
+            }
+            if(this.up==true) {
+                if(this.moveCount2==16){
+                    this.img =this.upImg;
+                }else if(this.moveCount2 ==8){
+                    this.img =this.upImg2;
+                }
+                this.y-=this.speed;
+            }
+            if(this.down==true) {
+                if(this.moveCount2==16){
+                    this.img =this.downImg;
+                }else if(this.moveCount2 ==8){
+                    this.img =this.downImg2;
+                }
+                this.y+=this.speed;
+            }
+            this.moveCount2--;
         }
-//ここにアルゴリズム書いてく
 
-
-
-
-
-
-
-        
     }
     moveReset(){//きつねの移動リセット
         this.left=false;
@@ -228,47 +293,47 @@ class foxClass { //きつねのクラス生成
 
 //黄色いきつね
 let yellowFox = new foxClass(enemyPositionX,enemyPositionY,'images/rightYellowFox1.png');
-yellowFox.leftImg='images/leftYellowFox1.png';
-yellowFox.leftImg2='images/leftYellowFox2.png';
-yellowFox.rightImg='images/rightYellowFox1.png';
-yellowFox.rightImg2='images/rightYellowFox2.png';
-yellowFox.upImg='images/upYellowFox1.png';
-yellowFox.upImg2='images/upYellowFox2.png';
-yellowFox.downImg='images/downYellowFox1.png';
-yellowFox.downImg2='images/downYellowFox2.png';
+yellowFox.leftImg.src='images/leftYellowFox1.png';
+yellowFox.leftImg2.src='images/leftYellowFox2.png';
+yellowFox.rightImg.src='images/rightYellowFox1.png';
+yellowFox.rightImg2.src='images/rightYellowFox2.png';
+yellowFox.upImg.src='images/upYellowFox1.png';
+yellowFox.upImg2.src='images/upYellowFox2.png';
+yellowFox.downImg.src='images/downYellowFox1.png';
+yellowFox.downImg2.src='images/downYellowFox2.png';
 
 //灰色きつね
 let grayFox = new foxClass(enemyPositionX+objectSize,enemyPositionY,'images/rightGrayFox1.png');
-grayFox.leftImg='images/leftGrayFox1.png';
-grayFox.leftImg2='images/leftGrayFox2.png';
-grayFox.rightImg='images/rightGrayFox1.png';
-grayFox.rightImg2='images/rightGrayFox2.png';
-grayFox.upImg='images/upGrayFox1.png';
-grayFox.upImg2='images/upGrayFox1.png';
-grayFox.downImg='images/downGrayFox1.png';
-grayFox.downImg2='images/downGrayFox2.png';
+grayFox.leftImg.src='images/leftGrayFox1.png';
+grayFox.leftImg2.src='images/leftGrayFox2.png';
+grayFox.rightImg.src='images/rightGrayFox1.png';
+grayFox.rightImg2.src='images/rightGrayFox2.png';
+grayFox.upImg.src='images/upGrayFox1.png';
+grayFox.upImg2.src='images/upGrayFox1.png';
+grayFox.downImg.src='images/downGrayFox1.png';
+grayFox.downImg2.src='images/downGrayFox2.png';
 
 //赤色きつね
 let redFox = new foxClass(enemyPositionX,enemyPositionY-objectSize,'images/rightRedFox1.png');
-redFox.leftImg='images/leftRedFox1.png';
-redFox.leftImg2='images/leftRedFox2.png';
-redFox.rightImg='images/rightRedFox1.png';
-redFox.rightImg2='images/rightRedFox2.png';
-redFox.upImg='images/upRedFox1.png';
-redFox.upImg2='images/upRedFox2.png';
-redFox.downImg='images/downRedFox1.png';
-redFox.downImg2='images/downRedFox2.png';
+redFox.leftImg.src='images/leftRedFox1.png';
+redFox.leftImg2.src='images/leftRedFox2.png';
+redFox.rightImg.src='images/rightRedFox1.png';
+redFox.rightImg2.src='images/rightRedFox2.png';
+redFox.upImg.src='images/upRedFox1.png';
+redFox.upImg2.src='images/upRedFox2.png';
+redFox.downImg.src='images/downRedFox1.png';
+redFox.downImg2.src='images/downRedFox2.png';
 
 //白きつね
 let whiteFox = new foxClass(enemyPositionX+objectSize,enemyPositionY-objectSize,'images/rightWhiteFox1.png');
-whiteFox.leftImg='images/leftWhiteFox1.png';
-whiteFox.leftImg2='images/leftWhiteFox2.png';
-whiteFox.rightImg='images/rightWhiteFox1.png';
-whiteFox.rightImg2='images/rightWhiteFox2.png';
-whiteFox.upImg='images/upWhiteFox1.png';
-whiteFox.upImg2='images/upWhiteFox2.png';
-whiteFox.downImg='images/downWhiteFox1.png';
-whiteFox.downImg2='images/downWhiteFox2.png';
+whiteFox.leftImg.src='images/leftWhiteFox1.png';
+whiteFox.leftImg2.src='images/leftWhiteFox2.png';
+whiteFox.rightImg.src='images/rightWhiteFox1.png';
+whiteFox.rightImg2.src='images/rightWhiteFox2.png';
+whiteFox.upImg.src='images/upWhiteFox1.png';
+whiteFox.upImg2.src='images/upWhiteFox2.png';
+whiteFox.downImg.src='images/downWhiteFox1.png';
+whiteFox.downImg2.src='images/downWhiteFox2.png';
 
 
 
@@ -279,7 +344,7 @@ whiteFox.downImg2='images/downWhiteFox2.png';
 
 
 
-
+let grassRepopCount=[];
 
 let mapObjects = [//マップに配置するアイテムの配列（値は下でランダムに決めてるのでここの中身の数字は関係ない
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -345,9 +410,6 @@ function draw() {//常時繰り返し呼び出される関数
         drawScore();//スコア表示
         
     }
-
-
-
     requestAnimationFrame( draw );
 }
 requestAnimationFrame( draw );
@@ -369,7 +431,7 @@ function drawTitle(){//タイトル画面
 function drawGame(){
     
     rabbitMove();//うさぎを移動する関数を呼び出す
-    yellowFox.move();
+    yellowFox.move2();
     grayFox.move();
     redFox.move();
     whiteFox.move();
@@ -551,10 +613,10 @@ function rabbitMove(){//うさぎを移動する関数
             rabbit.x -=rabbit.speed;
             rabbit.moveDirection=0;
             if(moveCount ==16-1){
-               rabbit.img.src =rabbit.leftImg;
+               rabbit.img =rabbit.leftImg;
                 
             }else if(moveCount==8-1){
-                rabbit.img.src =rabbit.leftImg2;
+                rabbit.img =rabbit.leftImg2;
             }
             objectCollider(y,x-1);
             
@@ -564,10 +626,10 @@ function rabbitMove(){//うさぎを移動する関数
             rabbit.x += rabbit.speed;
             rabbit.moveDirection=1;
             if(moveCount ==16-1){
-                rabbit.img.src =rabbit.rightImg;
+                rabbit.img =rabbit.rightImg;
                  
              }else if(moveCount==8-1){
-                 rabbit.img.src =rabbit.rightImg2;
+                 rabbit.img =rabbit.rightImg2;
              }
              objectCollider(y,x+1);
         }
@@ -575,10 +637,10 @@ function rabbitMove(){//うさぎを移動する関数
             rabbit.y -= rabbit.speed;
             rabbit.moveDirection=2;
             if(moveCount ==16-1){
-                rabbit.img.src =rabbit.upImg;
+                rabbit.img =rabbit.upImg;
                  
              }else if(moveCount==8-1){
-                 rabbit.img.src =rabbit.upImg2;
+                 rabbit.img =rabbit.upImg2;
              }
              objectCollider(y-1,x);
             
@@ -587,10 +649,10 @@ function rabbitMove(){//うさぎを移動する関数
             rabbit.y += rabbit.speed;
             rabbit.moveDirection=3;
             if(moveCount ==16-1){
-                rabbit.img.src =rabbit.downImg;
+                rabbit.img =rabbit.downImg;
                  
              }else if(moveCount==8-1){
-                 rabbit.img.src =rabbit.downImg2;
+                 rabbit.img =rabbit.downImg2;
              }
              objectCollider(y+1,x);
             
@@ -635,7 +697,7 @@ function enemyCollider(){//敵との衝突判定
 }
 
 function getScore(p){
- score+=p;
+    score+=p;
 }
 
 
@@ -649,10 +711,11 @@ const height = 20;
 
 function bfs(sx, sy, gx, gy) {
    
-    const prev = [];
+    //const prev = [];
     const dist=[];
     for(let y =0;y<height;y++){
         dist[y] =[];
+
         for(let x =0;x<width;x++){
             dist[y][x]=INF;
         }
@@ -668,61 +731,50 @@ function bfs(sx, sy, gx, gy) {
     
 
         for (let i = 0; i < 4; i++) {
-            const nx = cur.x + dx[i];
-            const ny = cur.y + dy[i];
+            let nx = cur.x + dx[i];
+            let ny = cur.y + dy[i];
       
-            if (nx < 0 || nx >= width || ny < 0 || ny >= height) {
-                //alert("範囲外");
+            if (nx < 0 || nx >= width || ny < 0 || ny >= height) {//alert("範囲外");
                 continue;
             }
-            if (map[ny][nx] === 1) {
-                //alert("壁");
+            if (map[ny][nx] === 1) {//alert("壁");
                 continue;
             }
-            if (dist[ny][nx] !== INF) {
-                //alert("もう見た");
+            if (dist[ny][nx] !== INF) {//alert("もう見た");
                 continue;
             }
-     
+            
         dist[ny][nx] = dist[cur.y][cur.x] + 1;
-        //alert(dist[ny][nx]);
         queue.push({ x: nx, y: ny });
-        prev[cur.y][cur.x] = cur;
-
         }
-    
     } 
-    let cx=nx;
-    let cy=ny;
-    let routes = [];
+    let cx=queue[queue.length-1].x;
+    let cy=queue[queue.length-1].y;
     while(dist[cy][cx]!=0){
         for(let i=0;i<4;i++){
             const px = cx + dx[i];
             const py = cy + dy[i];
-            if (px < 0 || px >= width || py < 0 || py >= height) {
-                //alert("範囲外");
+            if (px < 0 || px >= width || py < 0 || py >= height) {//alert("範囲外");
                 continue;
             }
-            if (map[py][px] === 1) {
-                //alert("壁");
+            if (map[py][px] === 1) {//alert("壁");
                 continue;
             }
-            if (dist[py][px] === INF) {
-                //alert("見なくていい");
+            if (dist[py][px] === INF) {//alert("見なくていい");
                 continue;
             }
-            if(dist[py][px]==dist[cy][cx]+1){
+            if(dist[py][px]==dist[cy][cx]-1){
                 routes.unshift({ x: cx, y: cy });
                 cx=px;
                 cy=py;
             }
-          
-          
         }
     }
-  
-  alert("できた");
- 
+    for(let i=0;i<routes.length;i++){
+        //alert(routes[i].x+" "+routes[i].y);
+        
+    }
+        
  
 }
 
