@@ -77,12 +77,13 @@ let carrot = new Object();//ニンジンのオブジェクト生成
 carrot.img = new Image();
 carrot.img.src ='images/itemCarrot.png';
 carrot.count =0;
-carrot.pop = 50;
+carrot.pop = 25;
 
 let candy = new Object();
 candy.img = new Image();
 candy.img.src ='images/itemCandy.png';
 candy.count =0;
+candy.pop = 8;
 
 
 let rabbit = new Object();//うさぎのオブジェクト生成
@@ -103,6 +104,23 @@ rabbit.downImg= new Image();
 rabbit.downImg.src  ='images/downRabbit1.png';
 rabbit.downImg2= new Image();
 rabbit.downImg2.src ='images/downRabbit2.png';
+rabbit.goldLeftImg= new Image();
+rabbit.goldLeftImg.src ='images/leftGoldRabbit.png';
+rabbit.goldLeftImg2= new Image();
+rabbit.goldLeftImg2.src = 'images/leftGoldRabbit2.png';
+rabbit.goldRightImg= new Image();
+rabbit.goldRightImg.src ='images/rightGoldRabbit.png';
+rabbit.goldRightImg2= new Image();
+rabbit.goldRightImg2.src ='images/rightGoldRabbit2.png';
+rabbit.goldUpImg = new Image();
+rabbit.goldUpImg.src ='images/upGoldRabbit.png';
+rabbit.goldUpImg2 = new Image();
+rabbit.goldUpImg2.src ='images/upGoldRabbit2.png';
+rabbit.goldDownImg = new Image();
+rabbit.goldDownImg.src = 'images/downGoldRabbit.png';
+rabbit.goldDownImg2 = new Image();
+rabbit.goldDownImg2.src = 'images/downGoldRabbit2.png';
+
 rabbit.img = new Image();
 rabbit.img = rabbit.leftImg;
 
@@ -146,12 +164,26 @@ class foxClass { //きつねのクラス生成
         this.moveDirection2 =[];
         this.chaseCount = Math.floor(Math.random()*5);
         this.moveI =0;
+
+        this.exist = true;
+        this.existCount=0;
     }
     move(){//きつねの移動関数1 (完全ランダムに動く)
         let fx = (this.x/32)-(blank/32);
         let fy = this.y/32;
         
         if(this.moveCount==0){//移動カウントが0のとき、移動の方向を決める
+            if(this.existCount<0){
+                this.existCount++;
+                if(this.existCount==0){
+                    this.x=enemyPositionX;
+                    this.y=enemyPositionY;
+                    this.moveReset();
+                    fx = (this.x/32)-(blank/32);
+                    fy = this.y/32;
+                    this.exist=true;
+                }
+            }
             this.moveCount=objectSize/this.speed;
             this.moveDirection = Math.floor(Math.random()*4);//0左 1右 2上 3下
             try{
@@ -236,11 +268,24 @@ class foxClass { //きつねのクラス生成
     move2(){//きつねの移動関数（幅優先探索を用いたおいかけ
         let fx2 = (this.x/32)-(blank/32);//きつねの現在位置x
         let fy2 = this.y/32;//きつねの現在位置y
+
+        
         
         let rx=Math.floor(rabbit.x/32)-(blank/32);//うさぎの現在位置x
         let ry=Math.floor(rabbit.y/32)//うさぎの現在位置y
         
         if(this.moveCount2==0){
+            if(this.existCount<0){
+                this.existCount++;
+                if(this.existCount==0){
+                    this.x=enemyPositionX;
+                    this.y=enemyPositionY;
+                    this.moveReset();
+                    fx2 = (this.x/32)-(blank/32);
+                    fy2 = this.y/32;
+                    this.exist=true;
+                }
+            }
             if(this.chaseCount==0){
             
                this.moveI =0;
@@ -485,14 +530,17 @@ let grassRepopCount = [//マップに草が復活するまでのカウント配�
 ];
 const GRASS =1;
 const CARROT =2;
+const CANDY =3;
+let itemPop =1000;
 
-for (let y=0; y<map.length; y++) {//ランダムオブジェクト（アイテム）生成
+
+//初期設定　ランダムオブジェクト（アイテム）生成
+for (let y=0; y<map.length; y++) {
     for (let x=0; x<map[y].length; x++) {
         if(map[y][x]===0){
-            let item=Math.floor(Math.random()*carrot.pop)
-            if(item==2){
-                mapObjects[y][x]=CARROT;//ニンジン 
-            }
+            let item=Math.floor(Math.random()*itemPop)
+            if(item<carrot.pop)mapObjects[y][x]=CARROT;//ニンジン 
+            else if(item<carrot.pop+candy.pop) mapObjects[y][x]=CANDY;
             else mapObjects[y][x]=GRASS;//草
         }else if(map[y][x]===1) mapObjects[y][x] =0;//壁にはオブジェクトを生成しない
     }
@@ -517,10 +565,7 @@ let bgmplayer =false;
 function draw() {//常時繰り返し呼び出される関数
     //キーボードが押された時、keydownfunc関数を呼び出す
 	addEventListener( "keydown", keydownfunc );
-    if(!bgmplayer) {
-        bgm.play();
-        bgmplayer=!bgmplayer;
-    }
+  
     
     if(scene==0){
         
@@ -579,12 +624,9 @@ function drawGame(){
     drawMap();//マップを描画
    
 
-    
     ctx.drawImage( rabbit.img,    0, 0, 1280, 1280,rabbit.x,    rabbit.y ,  32,32);//うさぎを描画
-    ctx.drawImage( yellowFox.img, 0, 0, 1280, 1280,yellowFox.x, yellowFox.y,32,32 );//きつねを描画
-    ctx.drawImage( grayFox.img, 0, 0, 1280, 1280,grayFox.x, grayFox.y,32,32 );//きつねを描画
-    ctx.drawImage( redFox.img, 0, 0, 1280, 1280,redFox.x, redFox.y,32,32 );//きつねを描画
-    ctx.drawImage( whiteFox.img, 0, 0, 1280, 1280,whiteFox.x, whiteFox.y,32,32 );//きつねを描画
+    drawFox();
+    
     
    
     enemyCollider();//敵との衝突判定
@@ -608,8 +650,9 @@ function grassRepop(){
             if(grassRepopCount[y][x]>0){
                 grassRepopCount[y][x]--;
                 if(grassRepopCount[y][x]==0){
-                    let r=Math.floor(Math.random()*carrot.pop)
-                    if(r==2)mapObjects[y][x]=CARROT;
+                    let item=Math.floor(Math.random()*itemPop);
+                    if(item<carrot.pop)mapObjects[y][x]=CARROT;
+                    else if(item<carrot.pop+candy.pop)mapObjects[y][x]=CANDY;
                     else mapObjects[y][x]=GRASS;
                 }
             }
@@ -652,6 +695,9 @@ function drawMap(){
                 if(mapObjects[y][x]===2){
                     ctx.drawImage(carrot.img, 0, 0, 1280, 1280, 32 * x +blank, 32 * y , 32, 32 );
                 }
+                if(mapObjects[y][x]===3){
+                    ctx.drawImage(candy.img, 0, 0, 1280, 1280, 32 * x +blank, 32 * y , 32, 32 );
+                }
             }
         }
     }
@@ -693,7 +739,7 @@ function drawGameOver(){
         ctx.font = '60px 美咲ゴシック'; // 使用するフォントを指定
         ctx.fillStyle = '#A7CC65';
         ctx.fillText('SCORE', 640, 200); // Canvas上にテキストを描画
-        ctx.fillText(score, 660, 320);
+        ctx.fillText(score, 650, 320);
 
         ctx.font = '30px 美咲ゴシック'; // 使用するフォントを指定
         ctx.fillStyle = 'white';
@@ -746,6 +792,7 @@ function keydownfunc( event ) {
         clickSound.play();
         startTime = performance.now();
         bgm.play();
+        bgm.loop = true;  // ループ再生
         scene=1;
     } 
     if( scene==2 && key_code === 32 ){//スペースキーで画面遷移
@@ -826,10 +873,17 @@ function rabbitMove(){//うさぎを移動する関数
             rabbit.x -=rabbit.speed;
             rabbit.moveDirection=0;
             if(moveCount ==16-1){
-               rabbit.img =rabbit.leftImg;
+                if(candy.count>0){
+                    candy.count--;
+                    rabbit.img =rabbit.goldLeftImg;
+                }else rabbit.img =rabbit.leftImg;
+               
                 
             }else if(moveCount==8-1){
-                rabbit.img =rabbit.leftImg2;
+                if(candy.count>0){
+                    candy.count--;
+                    rabbit.img = rabbit.goldLeftImg2;
+                }else rabbit.img =rabbit.leftImg2;
             }
             objectCollider(y,x-1);     
         }
@@ -837,10 +891,16 @@ function rabbitMove(){//うさぎを移動する関数
             rabbit.x += rabbit.speed;
             rabbit.moveDirection=1;
             if(moveCount ==16-1){
-                rabbit.img =rabbit.rightImg;
+                if(candy.count>0){
+                    candy.count--;
+                    rabbit.img = rabbit.goldRightImg;
+                }else rabbit.img =rabbit.rightImg;
                  
              }else if(moveCount==8-1){
-                 rabbit.img =rabbit.rightImg2;
+                if(candy.count>0){
+                    candy.count--;
+                    rabbit.img= rabbit.goldRightImg2;
+                }else rabbit.img =rabbit.rightImg2;
              }
              objectCollider(y,x+1);
         }
@@ -848,10 +908,16 @@ function rabbitMove(){//うさぎを移動する関数
             rabbit.y -= rabbit.speed;
             rabbit.moveDirection=2;
             if(moveCount ==16-1){
-                rabbit.img =rabbit.upImg;
+                if(candy.count>0){
+                    candy.count--;
+                    rabbit.img = rabbit.goldUpImg;
+                }else rabbit.img =rabbit.upImg;
                  
              }else if(moveCount==8-1){
-                 rabbit.img =rabbit.upImg2;
+                if(candy.count>0){
+                    candy.count--;
+                    rabbit.img =rabbit.goldUpImg2;
+                }else rabbit.img =rabbit.upImg2;
              }
              objectCollider(y-1,x);
             
@@ -860,10 +926,16 @@ function rabbitMove(){//うさぎを移動する関数
             rabbit.y += rabbit.speed;
             rabbit.moveDirection=3;
             if(moveCount ==16-1){
-                rabbit.img =rabbit.downImg;
+                if(candy.count>0){
+                    candy.count--;
+                    rabbit.img = rabbit.goldDownImg;
+                }else rabbit.img =rabbit.downImg;
                  
              }else if(moveCount==8-1){
-                 rabbit.img =rabbit.downImg2;
+                if(candy.count>0){
+                    candy.count--;
+                    rabbit.img =rabbit.goldDownImg2;
+                }else rabbit.img =rabbit.downImg2;
              }
              objectCollider(y+1,x);
             
@@ -881,10 +953,9 @@ function rabbitMoveReset(){//移動完了時のうさぎの挙動リセット
 }
 
 
-function objectCollider(y,x){
+function objectCollider(y,x){//アイテムや草との衝突判定
     if(x>0 && y>0){
         try{
-            
             if(mapObjects[y][x] ===1){//草と接触したら、草を消す
                 mapObjects[y][x]=-1;
                 grassRepopCount[y][x]=480*4;
@@ -893,33 +964,91 @@ function objectCollider(y,x){
                 ctx.clearRect((x)*32+blank, (y)*32, (x)*32+blank+32, (y)*32+32);
             }
             if(mapObjects[y][x] ===2){//ニンジンと接触したときの処理
-                mapObjects[y][x]=0;
+                mapObjects[y][x]=-1;
                 getItem.play();
                 getScore(1000);
                 ctx.clearRect((x)*32+blank, (y)*32, (x)*32+blank+32, (y)*32+32);
                 carrot.count+=320;
             }
+            if(mapObjects[y][x] ===3){
+                mapObjects[y][x]=-1;
+                getItem.play();
+                getScore(1500);
+                ctx.clearRect((x)*32+blank, (y)*32, (x)*32+blank+32, (y)*32+32);
+                candy.count+=30;
+            }
         }catch{}
     }
 }
 
+function drawFox(){
+    if(yellowFox.exist==true){
+        ctx.drawImage( yellowFox.img, 0, 0, 1280, 1280,yellowFox.x, yellowFox.y,32,32 );//黄きつねを描画
+    }
+    if(grayFox.exist==true){
+        ctx.drawImage( grayFox.img, 0, 0, 1280, 1280,grayFox.x, grayFox.y,32,32 );//灰きつねを描画
+    }
+    if(redFox.exist==true){
+        ctx.drawImage( redFox.img, 0, 0, 1280, 1280,redFox.x, redFox.y,32,32 );//赤きつねを描画
+    }
+    if(whiteFox.exist==true){
+        ctx.drawImage( whiteFox.img, 0, 0, 1280, 1280,whiteFox.x, whiteFox.y,32,32 );//白きつねを描画
+    }
+}
+
+
+
+
+
 function enemyCollider(){//敵との衝突判定
     
     if(rabbit.x<=yellowFox.x+objectSize-1 && rabbit.x+objectSize-1>=yellowFox.x && rabbit.y<=yellowFox.y+objectSize-1 &&rabbit.y+objectSize-1>=yellowFox.y){
-        gameoverSound.play();
-        scene=2;
+        if(yellowFox.exist==true){
+            if(candy.count>0){
+                yellowFox.existCount-=40;
+                yellowFox.exist=false;
+            }else{
+                gameoverSound.play();
+                bgm.pause();
+                scene=2;
+            }
+        }
     }
     if(rabbit.x<=grayFox.x+objectSize-1 && rabbit.x+objectSize-1>=grayFox.x && rabbit.y<=grayFox.y+objectSize-1 &&rabbit.y+objectSize-1>=grayFox.y){
-        gameoverSound.play();
-        scene=2;
+        if(grayFox.exist==true){
+            if(candy.count>0){
+                grayFox.existCount-=40;
+                grayFox.exist=false;
+            }else{
+                gameoverSound.play();
+                bgm.pause();
+                scene=2;
+            }
+        }
     }
     if(rabbit.x<=whiteFox.x+objectSize-1 && rabbit.x+objectSize-1>=whiteFox.x && rabbit.y<=whiteFox.y+objectSize-1 &&rabbit.y+objectSize-1>=whiteFox.y){
-        gameoverSound.play();
-        scene=2;
+        if(whiteFox.exist==true){
+            if(candy.count>0){
+                whiteFox.exist=false;
+                whiteFox.existCount-=40;
+            }else{
+                gameoverSound.play();
+                bgm.pause();
+                scene=2;
+            }
+        }
     }
     if(rabbit.x<=redFox.x+objectSize-1 && rabbit.x+objectSize-1>=redFox.x && rabbit.y<=redFox.y+objectSize-1 &&rabbit.y+objectSize-1>=redFox.y){
-        gameoverSound.play();
-        scene=2;
+        if(redFox.exist==true){
+            if(candy.count>0){
+                redFox.exist=false;
+                redFox.existCount-=40;
+            }else{
+                gameoverSound.play();
+                bgm.pause();
+                scene=2;
+            }
+        }
     }
 
 }
@@ -1058,6 +1187,8 @@ function reset(){
     redFox.moveCount = objectSize/redFox.speed;
     redFox.moveCount2 = objectSize/redFox.speed;
     redFox.moveI =0;
+    redFox.exist=true;
+    redFox.existCount=0;
 
     grayFox.moveReset();
     grayFox.x=enemyPositionX+objectSize;
@@ -1070,6 +1201,8 @@ function reset(){
     grayFox.moveCount = objectSize/grayFox.speed;
     grayFox.moveCount2 = objectSize/grayFox.speed;
     grayFox.moveI =0;
+    grayFox.exist=true;
+    grayFox.existCount=0;
 
     whiteFox.moveReset();
     whiteFox.x=enemyPositionX+objectSize;
@@ -1082,6 +1215,8 @@ function reset(){
     whiteFox.moveCount = objectSize/ whiteFox.speed;
     whiteFox.moveCount2 = objectSize/ whiteFox.speed;
     whiteFox.moveI =0;
+    whiteFox.exist=true;
+    whiteFox.existCount=0;
 
     yellowFox.moveReset();
     yellowFox.x=enemyPositionX;
@@ -1094,17 +1229,20 @@ function reset(){
     yellowFox.moveCount = objectSize/yellowFox.speed;
     yellowFox.moveCount2 = objectSize/yellowFox.speed;
     yellowFox.moveI =0;
+    yellowFox.exist=true;
+    yellowFox.existCount=0;
 
 
 
 
-    for (let y=0; y<map.length; y++) {//ランダムオブジェクト（アイテム）生成
+    itemPop =1000;
+    //初期設定　ランダムオブジェクト（アイテム）生成
+    for (let y=0; y<map.length; y++) {
         for (let x=0; x<map[y].length; x++) {
             if(map[y][x]===0){
-                let item=Math.floor(Math.random()*150)
-                if(item==2){
-                    mapObjects[y][x]=CARROT;//ニンジン 
-                }
+                let item=Math.floor(Math.random()*itemPop)
+                if(item<carrot.pop)mapObjects[y][x]=CARROT;//ニンジン 
+                else if(item<carrot.pop+candy.pop) mapObjects[y][x]=CANDY;
                 else mapObjects[y][x]=GRASS;//草
             }else if(map[y][x]===1) mapObjects[y][x] =0;//壁にはオブジェクトを生成しない
         }
