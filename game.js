@@ -19,7 +19,7 @@ const getItem = new Audio('sounds/getItem.mp3');
 const gameoverSound = new Audio('sounds/gameover.mp3');
 const getGrass = new Audio('sounds/getGrass.mp3');
 const clickSound = new Audio('sounds/clickSound.wav');
-
+const nockFox = new Audio('sounds/nockFox.wav');
 
 //コンテキストを取得
 let ctx = canvas.getContext( '2d' );
@@ -596,7 +596,7 @@ function drawTitle(){//タイトル画面
 
         ctx.font = '72px 美咲ゴシック'; // 使用するフォントを指定
         ctx.fillStyle = '#E0712C';
-        ctx.fillText('GRASSCORRIDOR', 480, 160); // Canvas上にテキストを描画
+        ctx.fillText('GRASSCORRIDOR', 475, 160); // Canvas上にテキストを描画
 
         ctx.drawImage( titleRabbit, 0, 0, 1280, 1280, 555, 200, 300, 300);
     });
@@ -1013,6 +1013,7 @@ function enemyCollider(){//敵との衝突判定
     if(rabbit.x<=yellowFox.x+objectSize-1 && rabbit.x+objectSize-1>=yellowFox.x && rabbit.y<=yellowFox.y+objectSize-1 &&rabbit.y+objectSize-1>=yellowFox.y){
         if(yellowFox.exist==true){
             if(candy.count>0){
+                nockFox.play();
                 yellowFox.existCount-=40;
                 yellowFox.exist=false;
                 getScore(10000);
@@ -1026,6 +1027,7 @@ function enemyCollider(){//敵との衝突判定
     if(rabbit.x<=grayFox.x+objectSize-1 && rabbit.x+objectSize-1>=grayFox.x && rabbit.y<=grayFox.y+objectSize-1 &&rabbit.y+objectSize-1>=grayFox.y){
         if(grayFox.exist==true){
             if(candy.count>0){
+                nockFox.play();
                 grayFox.existCount-=40;
                 grayFox.exist=false;
                 getScore(10000);
@@ -1039,6 +1041,7 @@ function enemyCollider(){//敵との衝突判定
     if(rabbit.x<=whiteFox.x+objectSize-1 && rabbit.x+objectSize-1>=whiteFox.x && rabbit.y<=whiteFox.y+objectSize-1 &&rabbit.y+objectSize-1>=whiteFox.y){
         if(whiteFox.exist==true){
             if(candy.count>0){
+                nockFox.play();
                 whiteFox.exist=false;
                 whiteFox.existCount-=40;
                 getScore(10000);
@@ -1052,6 +1055,7 @@ function enemyCollider(){//敵との衝突判定
     if(rabbit.x<=redFox.x+objectSize-1 && rabbit.x+objectSize-1>=redFox.x && rabbit.y<=redFox.y+objectSize-1 &&rabbit.y+objectSize-1>=redFox.y){
         if(redFox.exist==true){
             if(candy.count>0){
+                nockFox.play();
                 redFox.exist=false;
                 redFox.existCount-=40;
                 getScore(10000);
