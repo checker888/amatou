@@ -666,7 +666,7 @@ function drawScore(){
     ctx.font = '36px 美咲ゴシック'; // 使用するフォントを指定
     ctx.fillStyle = '#A7CC65';
     ctx.fillText("score", 975, 100); // Canvas上にテキストを描画
-    ctx.fillText(score, 980, 160); // Canvas上にテキストを描画
+    ctx.fillText(score, 970, 160); // Canvas上にテキストを描画
 
     let endTime = performance.now();
     min = Math.floor((endTime-startTime)/(60000));
