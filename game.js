@@ -1007,6 +1007,7 @@ function enemyCollider(){//敵との衝突判定
             if(candy.count>0){
                 yellowFox.existCount-=40;
                 yellowFox.exist=false;
+                getScore(10000);
             }else{
                 gameoverSound.play();
                 bgm.pause();
@@ -1019,6 +1020,7 @@ function enemyCollider(){//敵との衝突判定
             if(candy.count>0){
                 grayFox.existCount-=40;
                 grayFox.exist=false;
+                getScore(10000);
             }else{
                 gameoverSound.play();
                 bgm.pause();
@@ -1031,6 +1033,7 @@ function enemyCollider(){//敵との衝突判定
             if(candy.count>0){
                 whiteFox.exist=false;
                 whiteFox.existCount-=40;
+                getScore(10000);
             }else{
                 gameoverSound.play();
                 bgm.pause();
@@ -1043,6 +1046,7 @@ function enemyCollider(){//敵との衝突判定
             if(candy.count>0){
                 redFox.exist=false;
                 redFox.existCount-=40;
+                getScore(10000);
             }else{
                 gameoverSound.play();
                 bgm.pause();
