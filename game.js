@@ -122,6 +122,12 @@ rabbit.goldDownImg = new Image();
 rabbit.goldDownImg.src = 'images/downGoldRabbit.png';
 rabbit.goldDownImg2 = new Image();
 rabbit.goldDownImg2.src = 'images/downGoldRabbit2.png';
+rabbit.normalImg =new Image();
+rabbit.normalImg.src = 'images/normalRabbit.png';
+rabbit.carrotImg =new Image();
+rabbit.carrotImg.src = 'images/carrotRabbit.png';
+rabbit.goldImg =new Image();
+rabbit.goldImg.src ='images/goldRabbit.png';
 
 rabbit.img = new Image();
 rabbit.img = rabbit.leftImg;
@@ -677,9 +683,18 @@ function drawScore(){
     if(sec<10){
         sec="0"+sec;
     }
+
+    if(candy.count>0){
+        ctx.drawImage( rabbit.goldImg, 0, 0, 1280, 1280, 945, 400, 150, 150);
+    }else if(carrot.count>0){
+        ctx.drawImage( rabbit.carrotImg, 0, 0, 1280, 1280, 945, 400, 150, 150);
+    }else ctx.drawImage( rabbit.normalImg, 0, 0, 1280, 1280, 945, 400, 150, 150);
+    
+
+    ctx.font = '24px 美咲ゴシック'; // 使用するフォントを指定
     ctx.fillStyle = '#FFFFFF';
-    ctx.fillText("time", 985, 500); // Canvas上にテキストを描画
-    ctx.fillText(min+":"+sec, 975, 560); // Canvas上にテキストを描画
+    ctx.fillText("time", 1020, 600); // Canvas上にテキストを描画
+    ctx.fillText(min+":"+sec, 1020, 630); // Canvas上にテキストを描画
     //ctx.fillText(min, 970, 360); // Canvas上にテキストを描画
 
 }
