@@ -6,6 +6,8 @@ let enemyPositionX =blank +objectSize*9;//敵の初期位置基準x
 let enemyPositionY =320;//y
 let score=0;//スコア
 let moveCount =16;//1マスの移動にかかるカウント数(moveCount * キャラのスピード)
+let min;//ゲーム内時間（分）
+let sec;//ゲーム内時間（秒）
 //canvasの設定
 let canvas = document.getElementById( 'canvas' );
 canvas.width = 1080;    //canvasの横幅
@@ -667,8 +669,8 @@ function drawScore(){
     ctx.fillText(score, 980, 160); // Canvas上にテキストを描画
 
     let endTime = performance.now();
-    let min = Math.floor((endTime-startTime)/(60000));
-    let sec = Math.floor(((endTime-startTime)/1000)%60);
+    min = Math.floor((endTime-startTime)/(60000));
+    sec = Math.floor(((endTime-startTime)/1000)%60);
     if(min<10){
         min="0"+min;
     }
@@ -736,8 +738,14 @@ function drawGameOver(){
         ctx.fillStyle = 'red';
         ctx.fillText('GAME OVER', 630, 540); // Canvas上にテキストを描画
 
+        ctx.font = '36px 美咲ゴシック'; // 使用するフォントを指定
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText('TIME', 840, 200); // Canvas上にテキストを描画
+        ctx.fillText(min+":"+sec, 850, 320);
+
+
         ctx.font = '60px 美咲ゴシック'; // 使用するフォントを指定
-        ctx.fillStyle = '#A7CC65';
+        ctx.fillStyle = '#FDE200';
         ctx.fillText('SCORE', 640, 200); // Canvas上にテキストを描画
         ctx.fillText(score, 650, 320);
 
